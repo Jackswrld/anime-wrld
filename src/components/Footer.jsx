@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="footer-brand">
           <img src={image} alt="New World logo" className="footer-logo" />
           <div>
-            <p className="footer-brand-title">New World Anime</p>
+            <p className="footer-brand-title"> Anime Wrld</p>
             <p className="footer-brand-text">
               Discover trending anime, fan stories, and fresh picks from the anime world.
             </p>
@@ -34,8 +34,8 @@ const Footer = () => {
 
           <div className="footer-column">
             <h4>Follow</h4>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer">
-              Twitter
+            <a href="https://tiktok.com" target="_blank" rel="noreferrer">
+              TikTok
             </a>
             <a href="https://instagram.com" target="_blank" rel="noreferrer">
               Instagram
