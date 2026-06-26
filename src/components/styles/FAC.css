@@ -378,3 +378,97 @@
     width: 100%;
   }
 }
+
+.fac-placeholder-message,
+.fac-error-message {
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #ff2d78;
+  font-size: 1.05rem;
+  padding: 2rem;
+}
+
+.fac-placeholder-message {
+  color: #8892b0;
+}
+
+.fac-detail-skeleton {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.fac-detail-skeleton-image,
+.fac-detail-skeleton-line {
+  border-radius: 16px;
+  background: #121a3f;
+  animation: fac-pulse 1.5s ease-in-out infinite;
+}
+
+.fac-detail-skeleton-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.fac-detail-skeleton-line.title {
+  height: 2.4rem;
+  width: 60%;
+}
+
+.fac-detail-skeleton-line.meta {
+  height: 1.05rem;
+  width: 38%;
+}
+
+.fac-detail-skeleton-line.block {
+  height: 5rem;
+  width: 100%;
+}
+
+.fac-detail-skeleton-line.button {
+  height: 2.9rem;
+  width: 36%;
+}
+
+.fac-list-loading {
+  grid-column: 1 / -1;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: rgba(0, 240, 255, 0.08);
+  color: #d6f8ff;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-top: 0.55rem;
+}
+
+.fac-read-more {
+  margin-top: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #00f0ff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.fac-portrait-panel .fac-portrait-card {
+  min-height: 12.4rem;
+}
+
+@keyframes fac-pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}

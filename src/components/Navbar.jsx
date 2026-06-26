@@ -50,7 +50,7 @@ const Navbar = () => {
             <i className="fas fa-search navbar-search-icon" aria-hidden="true" />
           </label>
 
-          <Link className="navbar-latest-button" to="/latest-anime">
+          <Link className="navbar-latest-button" to="/catalogue">
             Latest Anime
           </Link>
         </div>
@@ -83,7 +83,7 @@ const Navbar = () => {
             <i className="fas fa-search navbar-search-icon" aria-hidden="true" />
           </label>
 
-          <Link className="navbar-mobile-latest-button" to="/latest-anime" onClick={closeMobileMenu}>
+          <Link className="navbar-mobile-latest-button" to="/catalogue" onClick={closeMobileMenu}>
             Latest Anime
           </Link>
         </div>

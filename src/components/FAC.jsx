@@ -1,141 +1,265 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./styles/FAC.css";
-import gojo from "../assets/Gojo Satoru.jpg"
-import luffy from "../assets/OnePiece.jpg"
-import levi  from "../assets/levi.jpg"
+import { fetchCharacterDetail, fetchCharactersPage } from "../api/jikan";
 
+const CHARACTER_PAGE_LIMIT = 20;
 
-// TODO: Replace mock data with Jikan API fetch when API phase begins
-// Endpoint: https://api.jikan.moe/v4/characters
-// This component is built scroll-ready for infinite data
-const characters = [
-  {
-    id: 1,
-    name: "Gojo Satoru",
-    anime: "Jujutsu Kaisen",
-    role: "Special Grade Jujutsu Sorcerer and teacher at Tokyo Jujutsu High",
-    age: 28,
-    flaws: ["Overconfident at times", "Underestimates opponents", "Emotionally distant", "Relies too heavily on his own power"],
-    abilities: ["Infinity", "Six Eyes", "Unlimited Void", "Hollow Purple"],
-    image: gojo,
-    learnMore: "#",
-  },
-  {
-    id: 2,
-    name: "Monkey D. Luffy",
-    anime: "One Piece",
-    role: "Captain of the Straw Hat Pirates, determined to become King of the Pirates",
-    age: 19,
-    flaws: ["Reckless decision making", "Poor strategic thinking", "Easily manipulated through his friends", "Ignores danger signs"],
-    abilities: ["Gum-Gum Fruit", "Haki", "Gear Fifth", "Conqueror's Haki"],
-    image: luffy,
-    learnMore: "#",
-  },
-  {
-    id: 3,
-    name: "Levi Ackerman",
-    anime: "Attack on Titan",
-    role: "Captain of the Survey Corps, humanity's strongest soldier",
-    age: 30,
-    flaws: ["Emotionally closed off", "Overly harsh with words", "Struggles to show vulnerability", "Carries guilt heavily"],
-    abilities: ["Ackerman Power", "Masterful blade combat", "Omni-directional mobility", "Superhuman reflex"],
-    image: levi,
-    learnMore: "#",
-  },
-  {
-    id: 4,
-    name: "Naruto Uzumaki",
-    anime: "Naruto",
-    role: "Seventh Hokage of the Hidden Leaf Village",
-    age: 17,
-    flaws: ["Impulsive in battle", "Academically slow", "Stubborn to a fault", "Lets emotions override logic"],
-    abilities: ["Nine-Tails Chakra Mode", "Shadow Clone Jutsu", "Rasengan", "Sage Mode"],
-    image: "https://placehold.co/300x300?text=Naruto",
-    learnMore: "#",
-  },
-  {
-    id: 5,
-    name: "Itachi Uchiha",
-    anime: "Naruto",
-    role: "Former ANBU Captain and Akatsuki member, secret protector of the Leaf",
-    age: 21,
-    flaws: ["Kept devastating secrets", "Sacrificed bonds for duty", "Cold exterior hides deep pain", "Undervalued his own life"],
-    abilities: ["Sharingan", "Tsukuyomi", "Amaterasu", "Susanoo"],
-    image: "https://placehold.co/300x300?text=Itachi",
-    learnMore: "#",
-  },
-  {
-    id: 6,
-    name: "Mikasa Ackerman",
-    anime: "Attack on Titan",
-    role: "Elite soldier of the Survey Corps, fiercely loyal protector",
-    age: 19,
-    flaws: ["Overly protective of Eren", "Suppresses her own emotions", "Struggles with identity", "Puts others above herself dangerously"],
-    abilities: ["Ackerman bloodline power", "Elite blade combat", "Tactical speed", "Superhuman endurance"],
-    image: "https://placehold.co/300x300?text=Mikasa",
-    learnMore: "#",
-  },
-  {
-    id: 7,
-    name: "Killua Zoldyck",
-    anime: "Hunter x Hunter",
-    role: "Former assassin from the Zoldyck family, Gon's closest friend",
-    age: 12,
-    flaws: ["Self-doubt in critical moments", "Conditioned to flee from stronger enemies", "Struggles with self-worth", "Overprotective of Gon"],
-    abilities: ["Godspeed", "Transmutation Nen", "Lightning Aura", "Assassin techniques"],
-    image: "https://placehold.co/300x300?text=Killua",
-    learnMore: "#",
-  },
-  {
-    id: 8,
-    name: "Zero Two",
-    anime: "Darling in the FranXX",
-    role: "Elite FranXX pilot known as a Partner Killer",
-    age: 16,
-    flaws: ["Emotionally unpredictable", "Dangerous to her partners", "Struggles with human connection", "Acts on instinct over reason"],
-    abilities: ["Hybrid Klaxosaur strength", "Strelizia piloting", "Accelerated healing", "Enhanced combat instincts"],
-    image: "https://placehold.co/300x300?text=ZeroTwo",
-    learnMore: "#",
-  },
-  {
-    id: 9,
-    name: "Light Yagami",
-    anime: "Death Note",
-    role: "Genius student turned self-appointed god of a new world",
-    age: 17,
-    flaws: ["God complex", "Manipulates everyone around him", "Cannot accept failure", "Loses his humanity progressively"],
-    abilities: ["Death Note mastery", "Genius-level intellect", "Psychological manipulation", "Meticulous planning"],
-    image: "https://placehold.co/300x300?text=Light",
-    learnMore: "#",
-  },
-  {
-    id: 10,
-    name: "Rimuru Tempest",
-    anime: "That Time I Got Reincarnated as a Slime",
-    role: "Demon Lord and founder of the Jura Tempest Federation",
-    age: 39,
-    flaws: ["Too trusting of allies", "Hesitates before using full power", "Takes on too much responsibility alone", "Naive about political threats"],
-    abilities: ["Great Sage", "Predator skill", "Rimuru's Unique Skills", "Infinite Regeneration"],
-    image: "https://placehold.co/300x300?text=Rimuru",
-    learnMore: "#",
-  },
-];
+const splitSentences = (text) =>
+  String(text)
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(/(?<=[.!?])\s+/)
+    .filter(Boolean);
+
+const findSentences = (text, keywords) => {
+  const normalized = String(text).trim();
+  return splitSentences(normalized).filter((sentence) =>
+    keywords.some((keyword) => sentence.toLowerCase().includes(keyword))
+  );
+};
+
+const buildCharacterItem = (item) => ({
+  mal_id: item.mal_id,
+  name: item.name,
+  image: item.images?.jpg?.image_url ?? "",
+  favorites: item.favorites ?? 0,
+  about: item.about ?? "",
+});
 
 const FAC = () => {
-  const [selectedCharacter, setSelectedCharacter] = useState(characters[0]);
-  const [isFading, setIsFading] = useState(false);
+  const [characters, setCharacters] = useState([]);
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [detailError, setDetailError] = useState(null);
+  const [aboutExpanded, setAboutExpanded] = useState(false);
+  const sentinelRef = useRef(null);
+  const observerRef = useRef(null);
 
-  const handleCharacterSelect = (character) => {
-    if (character.id === selectedCharacter.id || isFading) {
+  useEffect(() => {
+    const controller = new AbortController();
+    let timeoutId;
+
+    const loadCharacters = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        await new Promise((resolve) => {
+          timeoutId = window.setTimeout(resolve, 300);
+        });
+
+        const data = await fetchCharactersPage(page, controller.signal);
+        const nextCharacters = data.map(buildCharacterItem);
+
+        setCharacters((prev) => [...prev, ...nextCharacters]);
+
+        if (nextCharacters.length < CHARACTER_PAGE_LIMIT) {
+          setHasMore(false);
+        }
+      } catch (fetchError) {
+        if (fetchError.name !== "AbortError") {
+          setError("Failed to load characters.");
+          setHasMore(false);
+        }
+      } finally {
+        if (timeoutId) {
+          window.clearTimeout(timeoutId);
+        }
+        setLoading(false);
+      }
+    };
+
+    loadCharacters();
+
+    return () => {
+      controller.abort();
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+  }, [page]);
+
+  useEffect(() => {
+    if (!sentinelRef.current) {
       return;
     }
 
-    setIsFading(true);
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
 
-    window.setTimeout(() => {
-      setSelectedCharacter(character);
-      setIsFading(false);
-    }, 300);
+    if (!hasMore) {
+      return;
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting && hasMore && !loading) {
+          setPage((currentPage) => currentPage + 1);
+        }
+      },
+      { root: null, rootMargin: "200px", threshold: 0.1 }
+    );
+
+    observerRef.current.observe(sentinelRef.current);
+
+    return () => observerRef.current?.disconnect();
+  }, [hasMore, loading]);
+
+  const loadCharacterDetail = async (character) => {
+    if (detailLoading || selectedCharacter?.mal_id === character.mal_id) {
+      return;
+    }
+
+    setDetailLoading(true);
+    setDetailError(null);
+    setAboutExpanded(false);
+
+    try {
+      const detail = await fetchCharacterDetail(character.mal_id);
+      setSelectedCharacter({
+        ...character,
+        ...detail,
+      });
+    } catch {
+      setSelectedCharacter(null);
+      setDetailError("Could not load character details.");
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const renderDetailContent = () => {
+    if (detailLoading) {
+      return (
+        <div className="fac-detail-skeleton">
+          <div className="fac-detail-skeleton-image" />
+          <div className="fac-detail-body">
+            <div className="fac-detail-skeleton-line title" />
+            <div className="fac-detail-skeleton-line meta" />
+            <div className="fac-detail-skeleton-line meta" />
+            <div className="fac-detail-skeleton-line block" />
+            <div className="fac-detail-skeleton-line block" />
+            <div className="fac-detail-skeleton-line button" />
+          </div>
+        </div>
+      );
+    }
+
+    if (detailError) {
+      return <div className="fac-error-message">{detailError}</div>;
+    }
+
+    if (!selectedCharacter) {
+      return (
+        <div className="fac-placeholder-message">
+          Select a character to learn more
+        </div>
+      );
+    }
+
+    const aboutText = selectedCharacter.about || "Information not available.";
+    const displayedAbout =
+      aboutExpanded || aboutText.length <= 400
+        ? aboutText
+        : `${aboutText.slice(0, 400).trimEnd()}...`;
+
+    const animeAppearance = selectedCharacter.anime?.[0];
+    const englishVoice = selectedCharacter.voices?.find(
+      (voice) => voice.language === "English"
+    );
+
+    const abilities = findSentences(aboutText, [
+      "ability",
+      "power",
+      "technique",
+      "jutsu",
+      "skill",
+    ]);
+    const flaws = findSentences(aboutText, [
+      "weakness",
+      "flaw",
+      "limitation",
+      "struggle",
+    ]);
+
+    return (
+      <>
+        <img
+          className="fac-detail-image"
+          src={selectedCharacter.image}
+          alt={selectedCharacter.name}
+        />
+
+        <div className="fac-detail-body">
+          <h3 className="fac-character-name">{selectedCharacter.name}</h3>
+
+          {selectedCharacter.name_kanji ? (
+            <p className="fac-kanji-name">{selectedCharacter.name_kanji}</p>
+          ) : null}
+
+          <div className="fac-meta-block">
+            <span className="fac-meta-label">First Appearance</span>
+            <p>
+              {animeAppearance
+                ? `${animeAppearance.anime?.title || "Unknown"} — ${animeAppearance.role || "Unknown"}`
+                : "Unknown"}
+            </p>
+          </div>
+
+          <div className="fac-meta-block">
+            <span className="fac-meta-label">Voice Actor</span>
+            <p>{englishVoice?.person?.name || "Unknown"}</p>
+          </div>
+
+          <div className="fac-list-block">
+            <h4>About</h4>
+            <p className="fac-about-text">{displayedAbout}</p>
+            {aboutText.length > 400 ? (
+              <button
+                type="button"
+                className="fac-read-more"
+                onClick={() => setAboutExpanded((value) => !value)}
+              >
+                {aboutExpanded ? "Show less" : "Read more"}
+              </button>
+            ) : null}
+          </div>
+
+          <div className="fac-list-block">
+            <h4>Abilities</h4>
+            <ul className="fac-info-list">
+              {abilities.length > 0 ? (
+                abilities.map((ability) => <li key={ability}>{ability}</li>)
+              ) : (
+                <li>Information not available</li>
+              )}
+            </ul>
+          </div>
+
+          <div className="fac-list-block">
+            <h4>Flaws</h4>
+            <ul className="fac-info-list">
+              {flaws.length > 0 ? (
+                flaws.map((flaw) => <li key={flaw}>{flaw}</li>)
+              ) : (
+                <li>Information not available</li>
+              )}
+            </ul>
+          </div>
+
+          <div className="fac-meta-block">
+            <span className="fac-meta-label">Favorites</span>
+            <p>♥ {selectedCharacter.favorites} MAL favorites</p>
+          </div>
+        </div>
+      </>
+    );
   };
 
   return (
@@ -152,58 +276,44 @@ const FAC = () => {
           <aside className="fac-portrait-panel" aria-label="Favorite character list">
             {characters.map((character) => (
               <button
-                className={`fac-portrait-card${selectedCharacter.id === character.id ? " fac-portrait-card-active" : ""}`}
+                className={`fac-portrait-card${
+                  selectedCharacter?.mal_id === character.mal_id
+                    ? " fac-portrait-card-active"
+                    : ""
+                }`}
                 type="button"
-                key={character.id}
-                onClick={() => handleCharacterSelect(character)}
-                aria-pressed={selectedCharacter.id === character.id}
+                key={character.mal_id}
+                onClick={() => loadCharacterDetail(character)}
+                aria-pressed={selectedCharacter?.mal_id === character.mal_id}
               >
-                <img className="fac-portrait-image" src={character.image} alt={character.name} />
+                <img
+                  className="fac-portrait-image"
+                  src={character.image}
+                  alt={character.name}
+                />
                 <span className="fac-portrait-name">{character.name}</span>
-                <span className="fac-portrait-anime">{character.anime}</span>
+                <span className="fac-portrait-anime">♥ {character.favorites}</span>
               </button>
             ))}
+
+            {loading && characters.length > 0 && hasMore ? (
+              <div className="fac-list-loading" role="status">
+                Loading more characters...
+              </div>
+            ) : null}
+
+            <div ref={sentinelRef} className="fac-sentinel" />
           </aside>
 
-          <article className={`fac-detail-card${isFading ? " fac-detail-card-fading" : ""}`}>
-            <img className="fac-detail-image" src={selectedCharacter.image} alt={selectedCharacter.name} />
-
-            <div className="fac-detail-body">
-              <h3 className="fac-character-name">{selectedCharacter.name}</h3>
-
-              <div className="fac-meta-block">
-                <span className="fac-meta-label">Role</span>
-                <p>{selectedCharacter.role}</p>
-              </div>
-
-              <div className="fac-age-row">
-                <span className="fac-meta-label">Age</span>
-                <span className="fac-age-badge">{selectedCharacter.age}</span>
-              </div>
-
-              <div className="fac-list-block">
-                <h4>Character Flaws</h4>
-                <ul className="fac-info-list">
-                  {selectedCharacter.flaws.map((flaw) => (
-                    <li key={flaw}>{flaw}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="fac-list-block">
-                <h4>Abilities</h4>
-                <ul className="fac-info-list">
-                  {selectedCharacter.abilities.map((ability) => (
-                    <li key={ability}>{ability}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <a className="fac-learn-more" href={selectedCharacter.learnMore}>
-                Learn More
-              </a>
-            </div>
-          </article>
+          {error ? (
+            <article className="fac-detail-card">
+              <div className="fac-error-message">{error}</div>
+            </article>
+          ) : (
+            <article className={`fac-detail-card${detailLoading ? " fac-detail-card-fading" : ""}`}>
+              {renderDetailContent()}
+            </article>
+          )}
         </div>
       </div>
     </section>
