@@ -3,6 +3,7 @@ import History from "../components/History";
 import Navbar from "../components/Navbar";
 import Trending from "../components/Trending";
 import FAC from "../components/FAC";
+import Footer from "../components/Footer";
 
 const Home = () => {
   return (
@@ -12,6 +13,7 @@ const Home = () => {
       <Trending />
       <History />
       <FAC />
+      <Footer />
     </div>
   );
 };
