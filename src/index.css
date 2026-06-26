@@ -1,0 +1,22 @@
+:root {
+  --primary-color: #ff0000;
+  --secondary-color: #00ff00;
+  --background-color: #0000ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+  background: #041220;
+}
