@@ -24,7 +24,14 @@
   padding: 74px 84px 48px;
   box-sizing: border-box;
 }
-
+.test{
+  background: linear-gradient(95deg, #02d3e2, #ffffff);
+  background-clip: text;
+  color: transparent;
+  font-family: "Cinzel", serif;
+  font-size: clamp(2.5rem, 7vw, 4.1rem);
+  font-weight: 700;
+}
 .hero-title {
   display: flex;
   flex-direction: column;
@@ -32,7 +39,7 @@
   width: min(420px, 48vw);
   margin: 18px 24px 0 auto;
   color: #ffffff;
-  font-family: "Dosis", sans-serif;
+  font-family: "Cinzel", sans-serif;
   font-size: clamp(2.5rem, 5vw, 4.1rem);
   font-weight: 800;
   line-height: 1;

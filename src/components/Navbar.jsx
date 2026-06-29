@@ -66,28 +66,26 @@ const Navbar = () => {
         </button>
       </nav>
 
-      {isMobileOpen && (
-        <div className="navbar-mobile-menu">
-          <Link className="navbar-mobile-link" to="/" onClick={closeMobileMenu}>
-            Home
-          </Link>
-          <Link className="navbar-mobile-link" to="/animes" onClick={closeMobileMenu}>
-            Animes
-          </Link>
-          <Link className="navbar-mobile-link" to="/categories" onClick={closeMobileMenu}>
-            Categories
-          </Link>
+      <div className={`navbar-mobile-menu ${isMobileOpen ? "navbar-mobile-menu--open" : ""}`}>
+        <Link className="navbar-mobile-link" to="/" onClick={closeMobileMenu}>
+          Home
+        </Link>
+        <Link className="navbar-mobile-link" to="/animes" onClick={closeMobileMenu}>
+          Animes
+        </Link>
+        <Link className="navbar-mobile-link" to="/categories" onClick={closeMobileMenu}>
+          Categories
+        </Link>
 
-          <label className="navbar-mobile-search">
-            <input className="navbar-search-input" type="search" placeholder="Search..." />
-            <i className="fas fa-search navbar-search-icon" aria-hidden="true" />
-          </label>
+        <label className="navbar-mobile-search">
+          <input className="navbar-search-input" type="search" placeholder="Search..." />
+          <i className="fas fa-search navbar-search-icon" aria-hidden="true" />
+        </label>
 
-          <Link className="navbar-mobile-latest-button" to="/catalogue" onClick={closeMobileMenu}>
-            Latest Anime
-          </Link>
-        </div>
-      )}
+        <Link className="navbar-mobile-latest-button" to="/catalogue" onClick={closeMobileMenu}>
+          Latest Anime
+        </Link>
+      </div>
     </header>
   );
 };

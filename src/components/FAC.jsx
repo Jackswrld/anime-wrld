@@ -267,7 +267,7 @@ const FAC = () => {
       <div className="fac-inner">
         <div className="fac-header">
           <p className="fac-label">Favorite Anime Characters</p>
-          <h2 className="fac-title" id="fac-title">
+          <h2 className="fac-title" id="F.A.C">
             F.A.C
           </h2>
         </div>
