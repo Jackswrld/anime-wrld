@@ -192,6 +192,7 @@ const FAC = () => {
       "master",
       "capable",
       "strength",
+      "quirk",
       "gifted",
       "proficient",
       "trained",
