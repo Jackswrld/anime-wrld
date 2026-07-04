@@ -173,6 +173,13 @@ const FAC = () => {
     const englishVoice = selectedCharacter.voices?.find(
       (voice) => voice.language === "English"
     );
+    const englishVoiceName = englishVoice?.person?.name
+      ? englishVoice.person.name
+          .split(",")
+          .map((part) => part.trim())
+          .reverse()
+          .join(" ")
+      : "Unknown";
 
     const abilities = findSentences(aboutText, [
       "ability",
@@ -180,12 +187,40 @@ const FAC = () => {
       "technique",
       "jutsu",
       "skill",
+      "talent",
+      "expert",
+      "master",
+      "capable",
+      "strength",
+      "gifted",
+      "proficient",
+      "trained",
+      "combat",
+      "magic",
+      "wield",
+      "control",
+      "excel",
     ]);
     const flaws = findSentences(aboutText, [
       "weakness",
       "flaw",
       "limitation",
       "struggle",
+      "trouble",
+      "cannot",
+      "unable",
+      "fear",
+      "isolate",
+      "poor at",
+      "reluctant",
+      "lack",
+      "fails",
+      "difficult",
+      "arrogant",
+      "stubborn",
+      "reckless",
+      "impulsive",
+      "naive",
     ]);
 
     return (
@@ -214,7 +249,20 @@ const FAC = () => {
 
           <div className="fac-meta-block">
             <span className="fac-meta-label">Voice Actor</span>
-            <p>{englishVoice?.person?.name || "Unknown"}</p>
+            <p>
+              {englishVoiceName !== "Unknown" ? (
+                <a
+                  className="fac-voice-link"
+                  href={`https://www.google.com/search?q=${encodeURIComponent(englishVoiceName)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {englishVoiceName}
+                </a>
+              ) : (
+                "Unknown"
+              )}
+            </p>
           </div>
 
           <div className="fac-list-block">
@@ -263,11 +311,11 @@ const FAC = () => {
   };
 
   return (
-    <section className="fac-section" aria-labelledby="fac-title">
+    <section className="fac-section" aria-labelledby="fac-title" id="fac">
       <div className="fac-inner">
         <div className="fac-header">
           <p className="fac-label">Favorite Anime Characters</p>
-          <h2 className="fac-title" id="F.A.C">
+          <h2 className="fac-title" id="fac-title">
             F.A.C
           </h2>
         </div>

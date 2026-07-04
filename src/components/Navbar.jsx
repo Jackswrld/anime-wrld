@@ -5,7 +5,9 @@ import "./styles/Navbar.css";
 
 const Navbar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navbarRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -18,8 +20,39 @@ const Navbar = () => {
 
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
     };
   }, []);
+
+  const clearDropdownCloseTimer = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  };
+
+  const handleDropdownMouseEnter = () => {
+    clearDropdownCloseTimer();
+    setIsDropdownOpen(true);
+  };
+
+  const handleDropdownMouseLeave = () => {
+    clearDropdownCloseTimer();
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 150);
+  };
+
+  const handleDropdownLinkClick = (event, sectionId) => {
+    event.preventDefault();
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+    setIsDropdownOpen(false);
+  };
 
   const closeMobileMenu = () => {
     setIsMobileOpen(false);
@@ -33,14 +66,52 @@ const Navbar = () => {
         </Link>
 
         <div className="navbar-links">
-          <Link className="navbar-link" to="/">
-            Home
-          </Link>
-          <Link className="navbar-link" to="/animes">
+          <div
+            className="navbar-home-wrapper"
+            onMouseEnter={handleDropdownMouseEnter}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
+            <Link className="navbar-link navbar-home-link" to="/">
+              Home
+            </Link>
+
+            {isDropdownOpen && (
+              <div
+                className="navbar-dropdown"
+                role="menu"
+                onMouseEnter={handleDropdownMouseEnter}
+                onMouseLeave={handleDropdownMouseLeave}
+              >
+                <a
+                  className="navbar-dropdown-item"
+                  href="#trending"
+                  onClick={(event) => handleDropdownLinkClick(event, "trending")}
+                >
+                  Trending
+                </a>
+                <a
+                  className="navbar-dropdown-item"
+                  href="#history"
+                  onClick={(event) => handleDropdownLinkClick(event, "history")}
+                >
+                  History
+                </a>
+                <a
+                  className="navbar-dropdown-item"
+                  href="#fac"
+                  onClick={(event) => handleDropdownLinkClick(event, "fac")}
+                >
+                  F.A.C
+                </a>
+              </div>
+            )}
+          </div>
+
+          <Link className="navbar-link" to="/anime">
             Animes
           </Link>
           <Link className="navbar-link" to="/categories">
-            Categories
+            Worlds
           </Link>
         </div>
 

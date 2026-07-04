@@ -1,0 +1,59 @@
+.animes-page {
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
+  background: #0A0E2A;
+  color: #F0F8FF;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.animes-heading {
+  margin: 0 0 1.25rem;
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2rem, 3vw, 2.5rem);
+  color: #F0F8FF;
+}
+
+.animes-letterbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.animes-letter-btn {
+  padding: 0.4rem 0.65rem;
+  border: none;
+  background: transparent;
+  color: #F0F8FF;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+
+.animes-letter-active {
+  color: #00F0FF;
+  text-decoration: underline;
+}
+
+.animes-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.animes-title {
+  margin-bottom: 0.35rem;
+  color: #0dcae3;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.4;
+}
+
+.animes-empty {
+  color: #8892B0;
+  font-family: 'DM Sans', sans-serif;
+}
+
+@media (max-width: 640px) {
+  .animes-list {
+    grid-template-columns: 1fr;
+  }
+}

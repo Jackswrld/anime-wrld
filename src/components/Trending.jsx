@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { fetchTrendingAnime } from "../api/jikan";
 import "./styles/Trending.css";
 
 const Trending = () => {
@@ -11,46 +12,61 @@ const Trending = () => {
   useEffect(() => {
     const controller = new AbortController();
 
-    const loadTrending = async () => {
+    async function loadData() {
       try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch(
-          "https://api.jikan.moe/v4/top/anime?limit=3",
-          { signal: controller.signal }
-        );
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const json = await response.json();
-
-        const mapped = (json.data || []).map((item, index) => ({
-          mal_id: item.mal_id,
-          title: item.title,
-          image: item.images?.jpg?.large_image_url ?? "",
-          genres: item.genres?.slice(0, 2).map((genre) => genre.name) ?? ["Unknown"],
-          score: item.score ?? "N/A",
-          synopsis: item.synopsis ?? "",
-          rank: index + 1,
-        }));
-
-        setAnimeList(mapped);
+        const data = await fetchTrendingAnime(controller.signal);
+        setAnimeList(data);
       } catch (fetchError) {
         if (fetchError.name !== "AbortError") {
-          setError("Failed to load trending anime.");
+          if (import.meta.env.DEV) {
+            if (fetchError.message.includes("Jikan") || fetchError.message.includes("unavailable")) {
+              console.warn("[Trending] Jikan/MAL outage detected", fetchError);
+            } else {
+              console.warn("[Trending] Unexpected fetch error:", fetchError);
+            }
+          }
+
+          setError(
+            "MyAnimeList is temporarily unreachable — this usually resolves within a few minutes. Tap to retry."
+          );
         }
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    loadTrending();
-
+    loadData();
     return () => controller.abort();
   }, []);
+
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        const data = await fetchTrendingAnime(controller.signal);
+        setAnimeList(data);
+      } catch (fetchError) {
+        if (fetchError.name !== "AbortError") {
+          if (import.meta.env.DEV) {
+            if (fetchError.message.includes("Jikan") || fetchError.message.includes("unavailable")) {
+              console.warn("[Trending] Jikan/MAL outage detected", fetchError);
+            } else {
+              console.warn("[Trending] Unexpected fetch error:", fetchError);
+            }
+          }
+
+          setError(
+            "MyAnimeList is temporarily unreachable — this usually resolves within a few minutes. Tap to retry."
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+  };
 
   const trendingCards = loading
     ? [1, 2, 3].map((rank) => (
@@ -97,7 +113,12 @@ const Trending = () => {
 
         <div className="trending-showcase">
           {error ? (
-            <div className="trending-error">{error}</div>
+            <div className="trending-error">
+              <p>{error}</p>
+              <button className="trending-retry-btn" onClick={handleRetry}>
+                Try Again
+              </button>
+            </div>
           ) : (
             <>
               <div className="trending-card-row" aria-label="Trending anime">

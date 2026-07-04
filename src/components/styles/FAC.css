@@ -135,7 +135,20 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
+.fac-voice-link {
+  color: #00f0ff;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.35);
+  transition: color 180ms ease, border-color 180ms ease, text-shadow 180ms ease;
+}
 
+.fac-voice-link:hover,
+.fac-voice-link:focus-visible {
+  color: #fff;
+  border-bottom-color: #fff;
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+}
 .fac-age-row {
   display: flex;
   align-items: center;
