@@ -141,11 +141,11 @@ const Navbar = () => {
         <Link className="navbar-mobile-link" to="/" onClick={closeMobileMenu}>
           Home
         </Link>
-        <Link className="navbar-mobile-link" to="/animes" onClick={closeMobileMenu}>
+        <Link className="navbar-mobile-link" to="/anime" onClick={closeMobileMenu}>
           Animes
         </Link>
         <Link className="navbar-mobile-link" to="/categories" onClick={closeMobileMenu}>
-          Categories
+          Worlds
         </Link>
 
         <label className="navbar-mobile-search">
