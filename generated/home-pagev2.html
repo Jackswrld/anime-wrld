@@ -1,0 +1,760 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>New World Anime</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;family=Inter:wght@100..900&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#1c1b1a",
+              "on-surface-variant": "#444748",
+              "error-container": "#ffdad6",
+              "inverse-surface": "#313030",
+              "on-error-container": "#93000a",
+              tertiary: "#000000",
+              "outline-variant": "#c4c7c7",
+              secondary: "#4648d4",
+              "on-tertiary": "#ffffff",
+              "on-background": "#1c1b1b",
+              "accent-gold": "#C5A059",
+              "tertiary-fixed": "#e6e2df",
+              "on-primary-fixed": "#1c1b1b",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#fffbff",
+              "on-error": "#ffffff",
+              "on-secondary-fixed-variant": "#2f2ebe",
+              "surface-container-low": "#f7f3f2",
+              "secondary-container": "#6063ee",
+              primary: "#00F5D4",
+              "on-primary-fixed-variant": "#474746",
+              "border-muted": "#1F2937",
+              "on-surface": "#fdf8f8",
+              background: "#080B11",
+              "tertiary-container": "#1c1b1a",
+              "on-tertiary-container": "#868382",
+              "tertiary-fixed-dim": "#cac6c4",
+              "surface-variant": "#111622",
+              "surface-container-lowest": "#080B11",
+              "inverse-on-surface": "#f4f0ef",
+              "secondary-fixed-dim": "#c0c1ff",
+              "surface-container-high": "#111622",
+              error: "#ba1a1a",
+              "surface-cream": "#080B11",
+              "surface-container-highest": "#111622",
+              "on-secondary-fixed": "#07006c",
+              "ink-subtle": "#9CA3AF",
+              surface: "#111622",
+              "surface-tint": "#5f5e5e",
+              "surface-container": "#111622",
+              "primary-fixed": "#e5e2e1",
+              "primary-container": "#111622",
+              "on-primary": "#080B11",
+              "on-tertiary-fixed-variant": "#484645",
+              outline: "#374151",
+              "on-primary-container": "#00F5D4",
+              "secondary-fixed": "#e1e0ff",
+              "surface-dim": "#111622",
+              "primary-fixed-dim": "#c8c6c5",
+              "surface-bright": "#1F2937",
+              "inverse-primary": "#c8c6c5",
+            },
+            borderRadius: {
+              DEFAULT: "12px",
+              lg: "16px",
+              xl: "20px",
+              full: "9999px",
+            },
+            spacing: {
+              gutter: "24px",
+              "margin-mobile": "16px",
+              "margin-desktop": "64px",
+              base: "4px",
+              "container-max": "1280px",
+            },
+            fontFamily: {
+              "body-md": ["Inter", "sans-serif"],
+              "label-sm": ["Inter", "sans-serif"],
+              "label-md": ["Inter", "sans-serif"],
+              "headline-xl": ["Playfair Display", "serif"],
+              "headline-md": ["Playfair Display", "serif"],
+              "headline-xl-mobile": ["Playfair Display", "serif"],
+              "body-lg": ["Inter", "sans-serif"],
+              "headline-lg": ["Playfair Display", "serif"],
+            },
+            fontSize: {
+              "body-md": [
+                "16px",
+                {
+                  lineHeight: "1.6",
+                  fontWeight: "400",
+                },
+              ],
+              "label-sm": [
+                "12px",
+                {
+                  lineHeight: "1.2",
+                  letterSpacing: "0.03em",
+                  fontWeight: "600",
+                },
+              ],
+              "label-md": [
+                "14px",
+                {
+                  lineHeight: "1.4",
+                  letterSpacing: "0.01em",
+                  fontWeight: "500",
+                },
+              ],
+              "headline-xl": [
+                "48px",
+                {
+                  lineHeight: "1.1",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "700",
+                },
+              ],
+              "headline-md": [
+                "24px",
+                {
+                  lineHeight: "1.3",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-xl-mobile": [
+                "32px",
+                {
+                  lineHeight: "1.2",
+                  fontWeight: "700",
+                },
+              ],
+              "body-lg": [
+                "18px",
+                {
+                  lineHeight: "1.6",
+                  fontWeight: "400",
+                },
+              ],
+              "headline-lg": [
+                "36px",
+                {
+                  lineHeight: "1.2",
+                  fontWeight: "600",
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #080b11;
+        color: #fdf8f8;
+      }
+      .glass-panel {
+        background: rgba(17, 22, 34, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .hide-scroll::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scroll {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body
+    class="font-body-md text-body-md antialiased min-h-screen flex flex-col"
+  >
+    <!-- TopNavBar -->
+    <nav
+      class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-b border-muted/20"
+    >
+      <div
+        class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop h-16 flex justify-between items-center"
+      >
+        <div class="flex items-center gap-8">
+          <a
+            class="font-headline-md text-headline-md font-bold text-primary dark:text-on-primary-fixed"
+            href="#"
+            >New World Anime</a
+          >
+          <div class="hidden md:flex gap-6 items-center">
+            <a
+              class="text-secondary dark:text-secondary-fixed-dim border-b-2 border-secondary font-label-md text-label-md pb-1 opacity-80 backdrop-blur-2xl transition-all"
+              href="#"
+              >Discover</a
+            >
+            <a
+              class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary font-label-md text-label-md pb-1 hover:bg-surface-variant/50 transition-colors duration-300"
+              href="#"
+              >Trending</a
+            >
+            <a
+              class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary font-label-md text-label-md pb-1 hover:bg-surface-variant/50 transition-colors duration-300"
+              href="#"
+              >Library</a
+            >
+            <a
+              class="text-on-surface-variant dark:text-on-surface-variant hover:text-secondary font-label-md text-label-md pb-1 hover:bg-surface-variant/50 transition-colors duration-300"
+              href="#"
+              >Community</a
+            >
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div
+            class="hidden md:flex items-center bg-surface-container-highest rounded-full px-4 py-1.5 border border-muted focus-within:border-primary transition-colors"
+          >
+            <span class="material-symbols-outlined text-ink-subtle text-sm mr-2"
+              >search</span
+            >
+            <input
+              class="bg-transparent border-none text-on-surface text-sm focus:ring-0 placeholder-ink-subtle w-48 outline-none"
+              placeholder="Search anime, characters..."
+              type="text"
+            />
+          </div>
+          <button
+            class="p-2 text-on-surface-variant hover:text-secondary transition-colors md:hidden"
+          >
+            <span class="material-symbols-outlined">search</span>
+          </button>
+          <button
+            class="p-2 text-on-surface-variant hover:text-secondary transition-colors"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            class="p-2 text-on-surface-variant hover:text-secondary transition-colors"
+          >
+            <span class="material-symbols-outlined">account_circle</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <main class="flex-grow pt-16">
+      <!-- Hero Section -->
+      <section
+        class="relative w-full h-[819px] min-h-[600px] flex items-end pb-24 md:pb-32 px-margin-mobile md:px-margin-desktop overflow-hidden"
+      >
+        <div class="absolute inset-0 z-0">
+          <div
+            class="w-full h-full bg-cover bg-center bg-no-repeat absolute inset-0"
+            data-alt="A highly detailed cinematic still from a high-budget action anime featuring a lone hunter surrounded by glowing blue ethereal shadows in a dark, imposing dungeon environment. The lighting is dramatic, high-contrast, with intense cyan rim lighting against deep shadows. The visual style is premium digital animation, dark fantasy aesthetic, conveying intense power and anticipation."
+            style="
+              background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuDCD-mptTjjPFNolW7tUcSpzzAr5tdoCU6BGazOiU6YHF1Wm6TFH2WnNAByC80Wy7nGEuAW1kpZtnqk8lJekEWgOaPODeur8c4KNVK6R8xnRP5ROuBlQhR94B7Uc7SzbaFnH0aSTtAeBAYvUwNwTnCj-NoomQJn0zsevyorbG-nc4E_-1goUrrf76sdG87wHbLkpPBmkBFDrTB5EomzIHOBfNvxBXvruzwv9ed3DNjIhB0KyQVW_vw&quot;);
+            "
+          ></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"
+          ></div>
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-background via-background/50 to-transparent w-2/3"
+          ></div>
+        </div>
+        <div class="relative z-10 max-w-3xl flex flex-col gap-6">
+          <div class="flex items-center gap-3">
+            <span
+              class="bg-primary/20 text-primary px-3 py-1 rounded font-label-sm text-label-sm uppercase tracking-wider border border-primary/30"
+              >Trending #1</span
+            >
+            <span
+              class="text-ink-subtle font-label-sm text-label-sm flex items-center gap-1"
+              ><span class="material-symbols-outlined text-[16px]">star</span>
+              4.9</span
+            >
+            <span class="text-ink-subtle font-label-sm text-label-sm"
+              >2024</span
+            >
+            <span
+              class="text-ink-subtle font-label-sm text-label-sm border border-outline px-1.5 rounded-sm"
+              >TV-MA</span
+            >
+          </div>
+          <h1
+            class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-on-surface"
+          >
+            Solo Leveling
+          </h1>
+          <p
+            class="font-body-lg text-body-lg text-ink-subtle max-w-2xl line-clamp-3"
+          >
+            In a world where hunters with magical powers must battle deadly
+            monsters to protect humanity, humanity's weakest hunter finds
+            himself in a continuous struggle for survival. After surviving a
+            double dungeon, he receives a quest that changes his destiny
+            forever.
+          </p>
+          <div class="flex flex-wrap items-center gap-4 mt-2">
+            <button
+              class="bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md px-8 py-3 rounded flex items-center gap-2 transition-colors"
+            >
+              <span
+                class="material-symbols-outlined"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >play_arrow</span
+              >
+              Start Watching
+            </button>
+            <button
+              class="glass-panel hover:bg-surface-variant text-on-surface font-label-md text-label-md px-8 py-3 rounded flex items-center gap-2 transition-colors border border-outline"
+            >
+              <span class="material-symbols-outlined">add</span>
+              Add to List
+            </button>
+          </div>
+        </div>
+      </section>
+      <div
+        class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 flex flex-col gap-24"
+      >
+        <!-- Genres/Filters -->
+        <section class="flex gap-3 overflow-x-auto hide-scroll py-2">
+          <button
+            class="px-5 py-2 rounded-full border border-primary text-primary bg-primary/10 font-label-sm text-label-sm whitespace-nowrap transition-colors"
+          >
+            Action
+          </button>
+          <button
+            class="px-5 py-2 rounded-full border border-outline text-ink-subtle hover:text-on-surface hover:border-on-surface font-label-sm text-label-sm whitespace-nowrap transition-colors"
+          >
+            Adventure
+          </button>
+          <button
+            class="px-5 py-2 rounded-full border border-outline text-ink-subtle hover:text-on-surface hover:border-on-surface font-label-sm text-label-sm whitespace-nowrap transition-colors"
+          >
+            Fantasy
+          </button>
+          <button
+            class="px-5 py-2 rounded-full border border-outline text-ink-subtle hover:text-on-surface hover:border-on-surface font-label-sm text-label-sm whitespace-nowrap transition-colors"
+          >
+            Sci-Fi
+          </button>
+          <button
+            class="px-5 py-2 rounded-full border border-outline text-ink-subtle hover:text-on-surface hover:border-on-surface font-label-sm text-label-sm whitespace-nowrap transition-colors"
+          >
+            Romance
+          </button>
+          <button
+            class="px-5 py-2 rounded-full border border-outline text-ink-subtle hover:text-on-surface hover:border-on-surface font-label-sm text-label-sm whitespace-nowrap transition-colors"
+          >
+            Slice of Life
+          </button>
+          <button
+            class="px-5 py-2 rounded-full border border-outline text-ink-subtle hover:text-on-surface hover:border-on-surface font-label-sm text-label-sm whitespace-nowrap transition-colors"
+          >
+            Mystery
+          </button>
+        </section>
+        <!-- Trending Now Grid -->
+        <section class="flex flex-col gap-6">
+          <div class="flex justify-between items-end">
+            <h2 class="font-headline-md text-headline-md text-on-surface">
+              Trending Now
+            </h2>
+            <a
+              class="text-primary hover:text-primary/80 font-label-md text-label-md flex items-center gap-1 transition-colors"
+              href="#"
+              >View All
+              <span class="material-symbols-outlined text-sm"
+                >arrow_forward</span
+              ></a
+            >
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <!-- Anime Card 1 -->
+            <div class="group flex flex-col gap-3 cursor-pointer">
+              <div
+                class="relative w-full aspect-[2/3] rounded overflow-hidden glass-panel group-hover:border-primary transition-colors duration-300"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="A detailed, vibrant poster of a dynamic fantasy anime featuring a young swordsman surrounded by swirling magical elements. The lighting is intense with glowing red and orange accents against a dark background, showcasing premium 2D animation style with clean lines and high contrast."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuALSfmnGtYbA_auZ3s761hg8YE8HKVjO6iKzcekUkqI6l1bwhcyEEYr5tm8n9vWBDHORGlVlZaS1DZso5tOH0NC35oMa3MQOKaSiyjD04Q4XfTiFFYF4AdTFwnWbYIxDEdwaAOku2MRjs4eUjnN3xD3sprK6Q8Gafvg0k1OKt2vh0slErsf1zP9tSMEzmAUZOOKyiTkRiF0BnO8ZtnyL6QExQqxw3nskyDet3x5tjDy-EzTlG_qhtw"
+                />
+                <div
+                  class="absolute top-2 left-2 bg-surface-container-highest/90 backdrop-blur-sm px-2 py-1 rounded-sm flex items-center gap-1 border border-outline/50"
+                >
+                  <span
+                    class="material-symbols-outlined text-[12px] text-primary"
+                    style="font-variation-settings: &quot;FILL&quot; 1"
+                    >star</span
+                  >
+                  <span class="font-label-sm text-label-sm text-on-surface"
+                    >4.8</span
+                  >
+                </div>
+              </div>
+              <div>
+                <h3
+                  class="font-label-md text-label-md text-on-surface truncate group-hover:text-primary transition-colors"
+                >
+                  Demon Slayer: Hashira Training Arc
+                </h3>
+                <p class="font-label-sm text-label-sm text-ink-subtle mt-1">
+                  Ep 8 (Sub)
+                </p>
+              </div>
+            </div>
+            <!-- Anime Card 2 -->
+            <div class="group flex flex-col gap-3 cursor-pointer">
+              <div
+                class="relative w-full aspect-[2/3] rounded overflow-hidden glass-panel group-hover:border-primary transition-colors duration-300"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="A stunning anime poster featuring a futuristic cyberpunk cityscape with neon lights reflecting in rain puddles, centered on a cyborg protagonist looking over their shoulder. The color palette emphasizes deep purples and bright cyans, with a moody, high-tech atmosphere indicative of a premium sci-fi series."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCILeNMHUif2bN4UangCslywuQvCK95QJq_1PeBa54K47GRfB7Yd3ArjPzVywJusDH0y8om3HEqj2rr4WeJ9_ihGIfBV_Ze428xbT-nzkfpuy-zC3KF5nnOzypsI1fBUL-kb6qeRnX4Pbguic2t0AYKKWbCgCp3f3cdrGczUbu9FO8cGPm5LE0TVA37ihWPPV68tB8CtkgsTxwvXZb5MQmnOQzDKQPLA6owCVmLbtjpVAcNgKZHoNQ"
+                />
+                <div
+                  class="absolute top-2 left-2 bg-surface-container-highest/90 backdrop-blur-sm px-2 py-1 rounded-sm flex items-center gap-1 border border-outline/50"
+                >
+                  <span
+                    class="material-symbols-outlined text-[12px] text-primary"
+                    style="font-variation-settings: &quot;FILL&quot; 1"
+                    >star</span
+                  >
+                  <span class="font-label-sm text-label-sm text-on-surface"
+                    >4.9</span
+                  >
+                </div>
+              </div>
+              <div>
+                <h3
+                  class="font-label-md text-label-md text-on-surface truncate group-hover:text-primary transition-colors"
+                >
+                  Jujutsu Kaisen Season 2
+                </h3>
+                <p class="font-label-sm text-label-sm text-ink-subtle mt-1">
+                  Ep 23 (Dub/Sub)
+                </p>
+              </div>
+            </div>
+            <!-- Anime Card 3 -->
+            <div class="group flex flex-col gap-3 cursor-pointer">
+              <div
+                class="relative w-full aspect-[2/3] rounded overflow-hidden glass-panel group-hover:border-primary transition-colors duration-300"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="An ethereal anime poster depicting a serene, vast fantasy landscape with floating islands and ancient ruins. A small figure stands in the foreground looking out. The lighting is soft, morning light with warm golds and pale blues, conveying a sense of wonder and epic adventure in a high-fantasy setting."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9mh5XRgEbnNW2w4cDK-z-eHXuz1aDFayV_Znuu9-R2SqknkeayRG-lM4TkVswk78O5-Haxy93VtRSR97ZG9gB_DxtS6mpTJAPPhbklEmZBsJdM6ZbvnYR0DaxXx9dpC-NdjqPm-neEpv5B6F-DMqvbk7J6EhRNFhLyxBTYXvEMobQD4faPsgSLAUtaOJ1JrLmUf61uTTyBZDRadpIIuZTj6_GB8xf0ZEHNpiLLyH6ZH4qsnv6hcM"
+                />
+                <div
+                  class="absolute top-2 left-2 bg-surface-container-highest/90 backdrop-blur-sm px-2 py-1 rounded-sm flex items-center gap-1 border border-outline/50"
+                >
+                  <span
+                    class="material-symbols-outlined text-[12px] text-primary"
+                    style="font-variation-settings: &quot;FILL&quot; 1"
+                    >star</span
+                  >
+                  <span class="font-label-sm text-label-sm text-on-surface"
+                    >4.7</span
+                  >
+                </div>
+              </div>
+              <div>
+                <h3
+                  class="font-label-md text-label-md text-on-surface truncate group-hover:text-primary transition-colors"
+                >
+                  Frieren: Beyond Journey's End
+                </h3>
+                <p class="font-label-sm text-label-sm text-ink-subtle mt-1">
+                  Ep 28 (Sub)
+                </p>
+              </div>
+            </div>
+            <!-- Anime Card 4 -->
+            <div class="group flex flex-col gap-3 cursor-pointer">
+              <div
+                class="relative w-full aspect-[2/3] rounded overflow-hidden glass-panel group-hover:border-primary transition-colors duration-300"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="An action-packed anime poster featuring a diverse cast of stylized characters mid-combat in an urban setting. Explosions and motion lines dominate the composition. The color palette is bright and punchy with vibrant yellows and deep blacks, capturing the frantic energy of a shonen battle series."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCqVAu6oG1H-i9wt9iE8xak1UaVgIN7zyyo3nqvfetz4ZITyBWLj5OXHjuELV8Ud6joZGLbKN0Hgk_1rti6Xd6QDo56kb1mKMtKnr47rFBGm2wKjUpFM6yX2HvKJFks318Za6UigAGPHx3SQ4XNCdk-TIGEsqCY9gtF7I0gQxLFWcDgrbR7NUtxR6DZcaNZWcxqslTce_EEMTY3Twi-uHFNxzfLCbI4QkvNHKPzmuybrI7HTBAL9Y"
+                />
+              </div>
+              <div>
+                <h3
+                  class="font-label-md text-label-md text-on-surface truncate group-hover:text-primary transition-colors"
+                >
+                  Kaiju No. 8
+                </h3>
+                <p class="font-label-sm text-label-sm text-ink-subtle mt-1">
+                  Ep 12 (Dub/Sub)
+                </p>
+              </div>
+            </div>
+            <!-- Anime Card 5 -->
+            <div
+              class="group flex flex-col gap-3 cursor-pointer hidden lg:flex"
+            >
+              <div
+                class="relative w-full aspect-[2/3] rounded overflow-hidden glass-panel group-hover:border-primary transition-colors duration-300"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="A moody, psychological anime poster showing a mirrored reflection of an intense character's face splintering like glass. The aesthetic is dark academia mixed with supernatural elements, utilizing deep reds, shadows, and stark white contrast to evoke mystery and tension."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrXbEnlOHKjtdUSK-W96rMH6LXd2V6UzPYTQvmRHQ9khvmAzlDIf6PyCptytZOTpvkDtINkjadFqiiXYOuiHrA4LgdXQ0VLPalbCvkwCuvqORPI_zRJ_aBvaTEE0SjtiiXJOmGrWVxw7Ny2xTzvoTKk7NSSRdfUEGgpT9ftiKc8OOlbU_KC7qnaX9Vphmsz4_nUmVJBQzr-fjbxjmejJXaxE9WragrhH9VncUZZ3arE2yAlCCDGp8"
+                />
+              </div>
+              <div>
+                <h3
+                  class="font-label-md text-label-md text-on-surface truncate group-hover:text-primary transition-colors"
+                >
+                  Classroom of the Elite III
+                </h3>
+                <p class="font-label-sm text-label-sm text-ink-subtle mt-1">
+                  Ep 13 (Sub)
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- Top Characters / Profile Dashboard -->
+        <section class="flex flex-col gap-6">
+          <div class="flex justify-between items-end">
+            <h2 class="font-headline-md text-headline-md text-on-surface">
+              Top Characters
+            </h2>
+            <div class="flex gap-2">
+              <button
+                class="w-8 h-8 rounded-full glass-panel flex items-center justify-center hover:bg-surface-variant text-ink-subtle hover:text-on-surface transition-colors"
+              >
+                <span class="material-symbols-outlined text-sm"
+                  >chevron_left</span
+                >
+              </button>
+              <button
+                class="w-8 h-8 rounded-full glass-panel flex items-center justify-center hover:bg-surface-variant text-ink-subtle hover:text-on-surface transition-colors"
+              >
+                <span class="material-symbols-outlined text-sm"
+                  >chevron_right</span
+                >
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Featured Character -->
+            <div
+              class="lg:col-span-8 glass-panel rounded-xl overflow-hidden flex flex-col md:flex-row relative"
+            >
+              <div
+                class="w-full md:w-2/5 aspect-square md:aspect-auto relative"
+              >
+                <img
+                  class="w-full h-full object-cover"
+                  data-alt="A striking portrait of a powerful anime character with white hair and striking bright blue eyes visible through a partially removed blindfold. The art style is premium, high-contrast cell shading with deep shadows. The character exudes confidence and immense power, set against a minimal dark background."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeDu90riHXFzhmzTsaMMuyFO5t2bEjQGbh5CGiLllr7G94hsynR10-O_EG5Bi3jy93nZbjwQiUlM5DLLgwa7RKfCD6_ZumWB5EN8IKe_h2feeHeBXxqe-gHp1v8RVLVD6htE77nCSd9wp40UTcNOA99ADUCDaPdX12B4iG285kmgVs-oKLnBdUPfU-OS-dVb56AbJrPkTGxLSq41eYUMulBcvsI_MjkDkNVBaYC-emNH7fz-TMj9Y"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-surface-variant to-transparent opacity-80"
+                ></div>
+              </div>
+              <div
+                class="w-full md:w-3/5 p-6 md:p-8 flex flex-col justify-center relative z-10 bg-surface-variant md:bg-transparent"
+              >
+                <span
+                  class="text-primary font-label-sm text-label-sm uppercase tracking-wider mb-2"
+                  >#1 Most Popular</span
+                >
+                <h3
+                  class="font-headline-lg text-headline-lg text-on-surface mb-2"
+                >
+                  Gojo Satoru
+                </h3>
+                <p class="font-label-sm text-label-sm text-ink-subtle mb-6">
+                  Jujutsu Kaisen
+                </p>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                  <div
+                    class="bg-background/50 rounded-lg p-3 border border-outline/30"
+                  >
+                    <p class="font-label-sm text-label-sm text-ink-subtle mb-1">
+                      Role
+                    </p>
+                    <p class="font-label-md text-label-md text-on-surface">
+                      Teacher / Special Grade
+                    </p>
+                  </div>
+                  <div
+                    class="bg-background/50 rounded-lg p-3 border border-outline/30"
+                  >
+                    <p class="font-label-sm text-label-sm text-ink-subtle mb-1">
+                      Ability
+                    </p>
+                    <p class="font-label-md text-label-md text-on-surface">
+                      Limitless / Six Eyes
+                    </p>
+                  </div>
+                </div>
+                <p
+                  class="font-body-md text-body-md text-ink-subtle line-clamp-3 mb-6"
+                >
+                  The strongest jujutsu sorcerer in the world. He works as a
+                  teacher at the Tokyo Metropolitan Curse Technical College and
+                  uses his immense power to protect his students and reshape the
+                  jujutsu world.
+                </p>
+                <button
+                  class="text-primary font-label-md text-label-md flex items-center gap-2 hover:opacity-80 transition-opacity self-start"
+                >
+                  View Full Profile
+                  <span class="material-symbols-outlined text-sm"
+                    >arrow_forward</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Other Characters List -->
+            <div
+              class="lg:col-span-4 glass-panel rounded-xl p-6 flex flex-col gap-4"
+            >
+              <h4
+                class="font-label-md text-label-md text-on-surface border-b border-outline/30 pb-3 mb-2"
+              >
+                Fan Favorites
+              </h4>
+              <div
+                class="flex items-center gap-4 group cursor-pointer p-2 rounded-lg hover:bg-background/50 transition-colors"
+              >
+                <img
+                  class="w-12 h-12 rounded-full object-cover border border-outline group-hover:border-primary transition-colors"
+                  data-alt="A small, circular avatar portrait of a stern-looking anime character with short black hair and sharp eyes, wearing a dark uniform. The style is modern anime cell shading."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgLobf_yQJHGhJATSHp7c2KDt0MS0TKJbCZDFz_s3zVeEQIsw6dnpmHHEa3OPXrOeiF2ifBhACDGOaOsD3CjO3rzGVcSPE0g2qc_v6w7u9NCE7-IDPsc7Qhu6gLqrnOs-tWoDZbIk07-VRRasD2NiIwsjjnc_51g0wAS_vy9nDxOMcQ7FJRnMA--F7cC2rtr6cIlDmVP-eS1kJpZDlxkMki-TvPx7qSHtFF7mSuD75BjbHcjgdVFM"
+                />
+                <div class="flex-grow">
+                  <h5
+                    class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors"
+                  >
+                    Levi Ackerman
+                  </h5>
+                  <p class="font-label-sm text-label-sm text-ink-subtle">
+                    Attack on Titan
+                  </p>
+                </div>
+                <span class="text-ink-subtle font-label-sm text-label-sm"
+                  >#2</span
+                >
+              </div>
+              <div
+                class="flex items-center gap-4 group cursor-pointer p-2 rounded-lg hover:bg-background/50 transition-colors"
+              >
+                <img
+                  class="w-12 h-12 rounded-full object-cover border border-outline group-hover:border-primary transition-colors"
+                  data-alt="A small, circular avatar portrait of an expressive anime girl with pink hair and distinctive horns, wearing a school uniform. The style is bright and colorful."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnISW-V8AMDyoxNxLRQ3ehGuuxKWHW081iI1HZrkvdu45VPOCP687lJRxKBd2Lu4bqE7pIt1F9-IXrhM5J7W7s5684Euv8KicMXmGkPtWH-oLNOUgODl5YQQzSVD0X9O5xVWvmMWNc9BxIhygzzh1_LtWzIg8eowbGJuhkKof4K_2brC1KhebnkvOXaW660gMN5rBrsCwIxzphSPOdN6TUAc3b7T7u3AGW5exOrOZN-r5m5D753yU"
+                />
+                <div class="flex-grow">
+                  <h5
+                    class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors"
+                  >
+                    Power
+                  </h5>
+                  <p class="font-label-sm text-label-sm text-ink-subtle">
+                    Chainsaw Man
+                  </p>
+                </div>
+                <span class="text-ink-subtle font-label-sm text-label-sm"
+                  >#3</span
+                >
+              </div>
+              <div
+                class="flex items-center gap-4 group cursor-pointer p-2 rounded-lg hover:bg-background/50 transition-colors"
+              >
+                <img
+                  class="w-12 h-12 rounded-full object-cover border border-outline group-hover:border-primary transition-colors"
+                  data-alt="A small, circular avatar portrait of an intense anime boy with spiky ash-blond hair, looking angry. The lighting emphasizes his fierce expression."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrUVBvjOifd-NzG64NdRX75LnnUE1CikeUVYLwZ1cLZl0P3kB5RDlK2ME07ZXiKMQga38sD3Bvyve7Zr2suTucvrF62pXUO52Yy7GVUqFE_f4HuBdwHVy9KrsE2ArM1XSodwv8wYt0OdQpXUcpDZemdyiBWvVmXnyZrdC385Vzm94k07_OqQ9ZaRVbIDOpDy_8tyFdfi4ELn1PnWFuxUzUB2JslujNtH_UW7RYGeAPyF0Xj-4PV3A"
+                />
+                <div class="flex-grow">
+                  <h5
+                    class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors"
+                  >
+                    Katsuki Bakugo
+                  </h5>
+                  <p class="font-label-sm text-label-sm text-ink-subtle">
+                    My Hero Academia
+                  </p>
+                </div>
+                <span class="text-ink-subtle font-label-sm text-label-sm"
+                  >#4</span
+                >
+              </div>
+              <button
+                class="mt-auto pt-4 text-ink-subtle hover:text-on-surface font-label-md text-label-md text-center transition-colors"
+              >
+                See complete ranking
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer
+      class="bg-surface-container-highest dark:bg-surface-container-highest border-t border-muted/30 w-full py-12 mt-12"
+    >
+      <div
+        class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-8"
+      >
+        <div class="font-headline-md text-headline-md text-on-surface">
+          New World Anime
+        </div>
+        <div class="flex flex-wrap justify-center gap-6">
+          <a
+            class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors"
+            href="#"
+            >Terms of Service</a
+          >
+          <a
+            class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors"
+            href="#"
+            >Privacy Policy</a
+          >
+          <a
+            class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors"
+            href="#"
+            >Cookie Settings</a
+          >
+          <a
+            class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors"
+            href="#"
+            >Help Center</a
+          >
+          <a
+            class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors"
+            href="#"
+            >Contact Us</a
+          >
+        </div>
+        <div class="font-body-md text-body-md text-on-surface-variant text-sm">
+          © 2024 New World Anime. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

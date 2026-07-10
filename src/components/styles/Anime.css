@@ -18,8 +18,8 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1.25rem;
-  max-height: 120px;
-  overflow-y: auto;
+  padding-bottom: 0.25rem;
+  overflow-x: auto;
 }
 
 .animes-letter-btn {
@@ -47,29 +47,50 @@
   color: #0dcae3;
   font-family: 'DM Sans', sans-serif;
   line-height: 1.4;
+  display: block;
+  text-decoration: none;
 }
 
-.animes-empty {
+.animes-empty,
+.animes-status {
   color: #8892B0;
   font-family: 'DM Sans', sans-serif;
+}
+
+.animes-retry-btn,
+.animes-load-more {
+  margin-top: 0.75rem;
+  border: 1px solid #2A365F;
+  background: transparent;
+  color: #F0F8FF;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+.animes-load-more {
+  margin-top: 1rem;
 }
 
 @media (max-width: 640px) {
   .animes-list {
     grid-template-columns: 1fr;
   }
-  .animes-letterbar{
+
+  .animes-letterbar {
     gap: 0.25rem;
   }
+
   .animes-letter-btn {
     padding: 0.3rem 0.5rem;
     font-size: 0.85rem;
   }
-animes-page {
-  padding: 1.25rem 1rem;
-}
-.animes-heading {
-  font-size: 1.6rem;
-  margin-bottom: 1rem;
-}
+
+  .animes-page {
+    padding: 1.25rem 1rem;
+  }
+
+  .animes-heading {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+  }
 }

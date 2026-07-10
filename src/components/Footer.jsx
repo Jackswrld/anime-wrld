@@ -22,7 +22,7 @@ const Footer = () => {
             <h4>Explore</h4>
             <a href="#home">Home</a>
             <a href="#animes">Animes</a>
-            <a href="#categories">Categories</a>
+            <a href="#categories">Worlds</a>
           </div>
 
           <div className="footer-column">

@@ -110,7 +110,7 @@ const Navbar = () => {
           <Link className="navbar-link" to="/anime">
             Animes
           </Link>
-          <Link className="navbar-link" to="/categories">
+          <Link className="navbar-link" to="/worlds">
             Worlds
           </Link>
         </div>
@@ -144,7 +144,7 @@ const Navbar = () => {
         <Link className="navbar-mobile-link" to="/anime" onClick={closeMobileMenu}>
           Animes
         </Link>
-        <Link className="navbar-mobile-link" to="/categories" onClick={closeMobileMenu}>
+        <Link className="navbar-mobile-link" to="/worlds" onClick={closeMobileMenu}>
           Worlds
         </Link>
 

@@ -5,7 +5,7 @@
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  border-bottom: 6px solid #053f88;
+  border-bottom: 6px solid var(--color-surface);
 }
 
 .hero-section::before {
@@ -21,26 +21,28 @@
   min-height: calc(100vh - 42px);
   width: min(100%, 1180px);
   margin: 0 auto;
-  padding: 74px 84px 48px;
+  padding: var(--space-24) var(--space-24) var(--space-12);
   box-sizing: border-box;
 }
-.test{
-  background: linear-gradient(95deg, #02d3e2, #ffffff);
+
+.hero-brand {
+  background: linear-gradient(95deg, var(--color-accent-cyan), var(--color-text));
   background-clip: text;
   color: transparent;
-  font-family: "Cinzel", serif;
-  font-size: clamp(2.5rem, 7vw, 4.1rem);
+  font-family: var(--font-heading);
+  font-size: var(--fs-hero);
   font-weight: 700;
 }
+
 .hero-title {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: min(420px, 48vw);
-  margin: 18px 24px 0 auto;
-  color: #ffffff;
-  font-family: "Cinzel", sans-serif;
-  font-size: clamp(2.5rem, 5vw, 4.1rem);
+  margin: var(--space-4) var(--space-6) 0 auto;
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: var(--fs-hero);
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0;
@@ -50,9 +52,10 @@
 
 .hero-description {
   width: min(430px, 48vw);
-  margin: 150px 0 0 46px;
-  color: #ffffff;
-  font-size: clamp(1rem, 2.1vw, 1.35rem);
+  margin: var(--space-24) 0 0 var(--space-12);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body-lg);
   font-weight: 500;
   line-height: 1.36;
   text-align: center;
@@ -61,7 +64,7 @@
 
 @media (max-width: 900px) {
   .hero-content {
-    padding: 70px 36px 42px;
+    padding: var(--space-16) var(--space-8) var(--space-12);
   }
 
   .hero-title {
@@ -72,7 +75,7 @@
   .hero-description {
     width: min(410px, 58vw);
     margin-top: 130px;
-    margin-left: 10px;
+    margin-left: var(--space-2);
   }
 }
 
@@ -94,8 +97,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 42px;
-    padding: 44px 22px;
+    gap: var(--space-12);
+    padding: var(--space-12) var(--space-6);
   }
 
   .hero-title,
@@ -109,7 +112,7 @@
   }
 
   .hero-description {
-    font-size: 1rem;
+    font-size: var(--fs-body);
     line-height: 1.55;
   }
 }

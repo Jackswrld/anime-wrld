@@ -1,51 +1,97 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "../components/styles/Anime.css";
+import { fetchWithRetry } from "../api/jikan.js";
 
-const MOCK = [
-  { mal_id: 1, title: "Astra Verse" },
-  { mal_id: 2, title: "Black Tower" },
-  { mal_id: 3, title: "Celestial Dawn" },
-  { mal_id: 4, title: "Shadow Pulse" },
-  { mal_id: 5, title: "9-Bit Samurai" },
-  { mal_id: 6, title: "Arcane Festival" },
-  { mal_id: 7, title: "Blue Horizon" },
-  { mal_id: 8, title: "Crystal Crown" },
-  { mal_id: 9, title: "Silver Warden" },
-  { mal_id: 10, title: "Omega Drift" },
-  { mal_id: 11, title: "Aurora Break" },
-  { mal_id: 12, title: "Brightside" },
-  { mal_id: 13, title: "Comet Riders" },
-  { mal_id: 14, title: "Specter Code" },
-  { mal_id: 15, title: "#Zero Protocol" },
-  { mal_id: 16, title: "Alpha Night" },
-  { mal_id: 17, title: "Basilisk Flame" },
-  { mal_id: 18, title: "Catalyst Arc" },
-  { mal_id: 19, title: "Solar Echo" },
-  { mal_id: 20, title: "Byte Messiah" },
-  { mal_id: 21, title: "Abyss Watch" },
-  { mal_id: 22, title: "Beacon Dream" },
-  { mal_id: 23, title: "Corsair Legend" },
-  { mal_id: 24, title: "Starlight Run" },
-  { mal_id: 25, title: "Axion Rift" },
-  { mal_id: 26, title: "Blizzard Gate" },
-  { mal_id: 27, title: "Chaos Seed" },
-  { mal_id: 28, title: "Sentinel Prime" },
-  { mal_id: 29, title: "3D Odyssey" },
-  { mal_id: 30, title: "Artemis Fall" },
-];
-
-const alphabet = ["#", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))];
+const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+const ANIME_API_URL = "https://api.jikan.moe/v4/anime";
 
 function Animes() {
   const [selectedLetter, setSelectedLetter] = useState("A");
+  const [animeList, setAnimeList] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [error, setError] = useState("");
+  const selectedLetterRef = useRef(selectedLetter);
 
-  const filteredAnime = MOCK.filter((anime) => {
-    const firstChar = anime.title.trim().charAt(0).toUpperCase();
-    if (selectedLetter === "#") {
-      return /[^A-Z]/.test(firstChar);
+  useEffect(() => {
+    selectedLetterRef.current = selectedLetter;
+  }, [selectedLetter]);
+
+  const fetchPage = useCallback(async (nextPage, { append = false } = {}) => {
+    const requestedLetter = selectedLetterRef.current;
+
+    if (append) {
+      setIsLoadingMore(true);
+    } else {
+      setIsLoading(true);
+      setAnimeList([]);
+      setHasMore(false);
+      setPage(1);
     }
-    return firstChar === selectedLetter;
-  });
+
+    setError("");
+
+    try {
+      const response = await fetchWithRetry(
+        `${ANIME_API_URL}?page=${nextPage}&limit=25&order_by=title&sort=asc&letter=${encodeURIComponent(requestedLetter)}`
+      );
+      const json = await response.json();
+      const loadedAnime = (json.data || []).map((item) => ({
+        mal_id: item.mal_id,
+        title: item.title,
+        url: item.url,
+      }));
+
+      if (requestedLetter !== selectedLetterRef.current) {
+        return;
+      }
+
+      setAnimeList((currentAnime) => (append ? [...currentAnime, ...loadedAnime] : loadedAnime));
+      setPage(nextPage);
+      setHasMore(Boolean(json.pagination?.has_next_page));
+    } catch {
+      if (requestedLetter !== selectedLetterRef.current) {
+        return;
+      }
+      setError("Couldn't load anime right now, please try again");
+    } finally {
+      if (requestedLetter === selectedLetterRef.current) {
+        if (append) {
+          setIsLoadingMore(false);
+        } else {
+          setIsLoading(false);
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const timerId = window.setTimeout(() => {
+      void fetchPage(1);
+    }, 0);
+
+    return () => window.clearTimeout(timerId);
+  }, [fetchPage, selectedLetter]);
+
+  const handleLetterChange = (letter) => {
+    if (letter === selectedLetter) {
+      return;
+    }
+
+    selectedLetterRef.current = letter;
+    setSelectedLetter(letter);
+  };
+
+  const handleRetry = () => {
+    if (animeList.length === 0) {
+      fetchPage(1);
+      return;
+    }
+
+    fetchPage(page, { append: false });
+  };
 
   return (
     <div className="animes-page">
@@ -59,7 +105,7 @@ function Animes() {
               key={letter}
               type="button"
               className={`animes-letter-btn${isActive ? " animes-letter-active" : ""}`}
-              onClick={() => setSelectedLetter(letter)}
+              onClick={() => handleLetterChange(letter)}
             >
               {letter}
             </button>
@@ -67,15 +113,52 @@ function Animes() {
         })}
       </div>
 
-      {filteredAnime.length === 0 ? (
+      {isLoading ? (
+        <div className="animes-status">Loading...</div>
+      ) : error && animeList.length === 0 ? (
+        <div className="animes-status">
+          <div>{error}</div>
+          <button type="button" className="animes-retry-btn" onClick={handleRetry}>
+            Retry
+          </button>
+        </div>
+      ) : animeList.length === 0 ? (
         <div className="animes-empty">No anime found starting with {selectedLetter}</div>
       ) : (
-        <div className="animes-list">
-          {filteredAnime.map((anime) => (
-            <div key={anime.mal_id} className="animes-title">
-              {anime.title}
-            </div>
-          ))}
+        <>
+          <div className="animes-list">
+            {animeList.map((anime) => (
+              <a
+                key={anime.mal_id}
+                href={anime.url}
+                target="_blank"
+                rel="noreferrer"
+                className="animes-title"
+              >
+                {anime.title}
+              </a>
+            ))}
+          </div>
+
+          {hasMore && (
+            <button
+              type="button"
+              className="animes-load-more"
+              onClick={() => fetchPage(page + 1, { append: true })}
+              disabled={isLoadingMore}
+            >
+              {isLoadingMore ? "Loading..." : "Load More"}
+            </button>
+          )}
+        </>
+      )}
+
+      {error && animeList.length > 0 && (
+        <div className="animes-status">
+          <div>{error}</div>
+          <button type="button" className="animes-retry-btn" onClick={handleRetry}>
+            Retry
+          </button>
         </div>
       )}
     </div>

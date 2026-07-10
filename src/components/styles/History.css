@@ -7,10 +7,10 @@
   overflow: hidden;
   background:
     radial-gradient(circle at 78% 18%, rgba(96, 165, 250, 0.14), transparent 25rem),
-    linear-gradient(135deg, rgba(89, 34, 167, 0.12), transparent 44%),
-    #0a0f2c;
-  color: #ffffff;
-  font-family: "DM Sans", sans-serif;
+    linear-gradient(135deg, rgba(34, 167, 158, 0.03), transparent 44%),
+    var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
   padding: 6rem 1.5rem;
 }
 
@@ -40,8 +40,8 @@
 
 .history-heading h2 {
   margin: 0;
-  font-family: "Cinzel", serif;
-  font-size: clamp(2.35rem, 5vw, 2.8rem);
+  font-family: var(--font-heading);
+  font-size: var(--fs-h1);
   font-weight: 700;
   line-height: 1.08;
   letter-spacing: 0;
@@ -49,8 +49,8 @@
 
 .history-heading p {
   margin: 0.65rem 0 0;
-  color: #7dd3fc;
-  font-family: "Cinzel", serif;
+  color: var(--color-accent-sky);
+  font-family: var(--font-heading);
   font-size: clamp(1.18rem, 2.5vw, 1.4rem);
   font-weight: 700;
   line-height: 1.2;
@@ -72,13 +72,31 @@
   bottom: 0.35rem;
   left: 0;
   width: 2px;
-  border-radius: 999px;
-  background: #7dd3fc;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-sky);
   box-shadow: 0 0 16px rgba(125, 211, 252, 0.62);
 }
 
 .history-entry {
   position: relative;
+  opacity: 0;
+  animation: history-fade-up 0.6s ease forwards;
+}
+
+.history-entry:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.history-entry:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.history-entry:nth-child(3) {
+  animation-delay: 0.35s;
+}
+
+.history-entry:nth-child(4) {
+  animation-delay: 0.5s;
 }
 
 .history-dot {
@@ -89,7 +107,7 @@
   height: 12px;
   border: 2px solid rgba(255, 255, 255, 0.76);
   border-radius: 50%;
-  background: #7dd3fc;
+  background: var(--color-accent-sky);
   box-shadow: 0 0 18px rgba(125, 211, 252, 0.82);
 }
 
@@ -99,16 +117,16 @@
   min-height: 2rem;
   padding: 0 0.78rem;
   border: 1px solid rgba(125, 211, 252, 0.22);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(45, 212, 191, 0.12);
-  color: #bdefff;
+  color: var(--color-accent-sky-light);
   font-size: 0.76rem;
   font-weight: 700;
 }
 
 .history-entry h3 {
   margin: 0.72rem 0 0.45rem;
-  color: #ffffff;
+  color: var(--color-text);
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.25;
@@ -117,15 +135,15 @@
 .history-entry p {
   max-width: 61ch;
   margin: 0;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted);
   font-size: 0.95rem;
   line-height: 1.7;
 }
 
 .history-featured-text {
   padding: 1rem 1.1rem;
-  border-left: 3px solid #7dd3fc;
-  border-radius: 0 12px 12px 0;
+  border-left: 3px solid var(--color-accent-sky);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
   background: rgba(255, 255, 255, 0.07);
   box-shadow: 0 0 24px rgba(125, 211, 252, 0.1);
 }
@@ -139,9 +157,9 @@
   margin-top: 2.4rem;
   padding: 0 1.35rem;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.09);
-  color: #ffffff;
+  color: var(--color-text);
   font-size: 0.98rem;
   font-weight: 700;
   text-decoration: none;
@@ -171,10 +189,10 @@
   width: min(100%, 430px);
   min-height: 185px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--shadow-card);
   backdrop-filter: blur(14px);
 }
 
@@ -188,8 +206,8 @@
 
 .history-card-copy h3 {
   margin: 0;
-  color: #ffffff;
-  font-family: "Cinzel", serif;
+  color: var(--color-text);
+  font-family: var(--font-heading);
   font-size: clamp(1.05rem, 2vw, 1.32rem);
   font-weight: 700;
   line-height: 1.18;
@@ -198,7 +216,7 @@
 
 .history-card-copy p {
   margin: 0.7rem 0 0;
-  color: rgba(255, 255, 255, 0.66);
+  color: var(--color-text-muted);
   font-size: 0.9rem;
   line-height: 1.45;
 }
@@ -209,6 +227,26 @@
   height: 100%;
   min-height: 185px;
   object-fit: cover;
+}
+
+@keyframes history-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-entry {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (max-width: 860px) {
