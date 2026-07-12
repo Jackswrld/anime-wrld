@@ -73,3 +73,56 @@ export const fetchTrendingAnime = async (signal) => {
     rank: index + 1,
   }));
 };
+
+let genreMapCache = null;
+
+export const fetchAnimeByGenres = async (genreIds, page = 1, signal) => {
+  const response = await fetchWithRetry(
+    `https://api.jikan.moe/v4/anime?genres=${genreIds.join(",")}&page=${page}&order_by=start_date&sort=desc&sfw=false`,
+    { signal }
+  );
+
+  const json = await response.json();
+  return {
+    data: json.data || [],
+    pagination: json.pagination || {},
+  };
+};
+
+export const fetchGenreMap = async () => {
+  if (genreMapCache !== null) {
+    return genreMapCache;
+  }
+
+  const endpoints = [
+    { url: "https://api.jikan.moe/v4/genres/anime?filter=genres", category: "genre" },
+    { url: "https://api.jikan.moe/v4/genres/anime?filter=explicit_genres", category: "explicit_genre" },
+    { url: "https://api.jikan.moe/v4/genres/anime?filter=themes", category: "theme" },
+    { url: "https://api.jikan.moe/v4/genres/anime?filter=demographics", category: "demographic" },
+  ];
+
+  const seenNames = new Set();
+  const merged = [];
+
+  for (const endpoint of endpoints) {
+    const response = await fetchWithRetry(endpoint.url);
+    const json = await response.json();
+    const items = Array.isArray(json.data) ? json.data : [];
+
+    for (const item of items) {
+      if (!item?.name || seenNames.has(item.name)) {
+        continue;
+      }
+
+      seenNames.add(item.name);
+      merged.push({
+        id: item.mal_id,
+        name: item.name,
+        category: endpoint.category,
+      });
+    }
+  }
+
+  genreMapCache = merged;
+  return merged;
+};

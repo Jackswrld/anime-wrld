@@ -1,0 +1,113 @@
+.worlds {
+  padding: var(--space-16) var(--space-6);
+  color: var(--color-text);
+}
+
+.worlds-hero {
+  max-width: 72ch;
+  margin: 0 auto var(--space-8);
+}
+
+.worlds-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1.08;
+  margin: 0 0 var(--space-4);
+  color: var(--color-text);
+}
+
+.worlds-subheading {
+  font-family: var(--font-body);
+  font-size: var(--fs-body-lg);
+  line-height: 1.7;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.worlds-pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.worlds-pill {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  padding: calc(var(--space-2) + 2px) var(--space-4);
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.worlds-pill:hover {
+  border-color: var(--color-accent-cyan);
+  box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.worlds-pill-active {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: var(--color-accent-cyan);
+}
+
+.worlds-pill-shake {
+  animation: worlds-shake 300ms ease-in-out;
+}
+
+@keyframes worlds-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  15% {
+    transform: translateX(-4px);
+  }
+
+  35% {
+    transform: translateX(4px);
+  }
+
+  55% {
+    transform: translateX(-2px);
+  }
+
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+.worlds-status,
+.worlds-results {
+  margin-top: var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  color: var(--color-text);
+}
+
+.worlds-results-wrapper {
+  margin-top: var(--space-8);
+}
+
+.worlds-results-grid {
+  display: block;
+}
+
+.worlds-results-grid .trending-card-row {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.worlds-error {
+  color: var(--color-accent-pink);
+}
+
+.worlds-sentinel {
+  height: 1px;
+}
+
