@@ -149,6 +149,31 @@
   border-bottom-color: #fff;
   text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
 }
+
+.fac-va-name {
+  color: #f0f8ff;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.fac-voice-image {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(0, 240, 255, 0.28);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.16);
+}
+
+.fac-va-image-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px dashed rgba(136, 146, 176, 0.4);
+  background: rgba(255, 255, 255, 0.04);
+}
 .fac-age-row {
   display: flex;
   align-items: center;
@@ -207,6 +232,19 @@
   background: #00f0ff;
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.75);
   transform: translateY(-50%);
+}
+
+.fac-credit-title {
+  display: block;
+  color: #f0f8ff;
+  font-weight: 700;
+}
+
+.fac-credit-voice {
+  display: block;
+  margin-top: 0.25rem;
+  color: rgba(240, 248, 255, 0.9);
+  font-size: 0.95rem;
 }
 
 .fac-learn-more {

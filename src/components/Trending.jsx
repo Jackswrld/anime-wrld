@@ -1,21 +1,74 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { fetchTrendingAnime } from "../api/jikan";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { fetchTrendingAnime } from "../api/anilist";
 import "./styles/Trending.css";
+
+const normalizeTrendingAnime = (anime, index) => ({
+  id: anime.id,
+  title: anime.title?.romaji ?? anime.title?.english ?? "Unknown",
+  image: anime.coverImage?.extraLarge ?? anime.coverImage?.large ?? "",
+  genres: anime.genres ?? [],
+  rank: index + 1,
+});
 
 const Trending = () => {
   const [animeList, setAnimeList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [canScrollRow, setCanScrollRow] = useState(false);
+  const [scrollLeftDisabled, setScrollLeftDisabled] = useState(true);
+  const [scrollRightDisabled, setScrollRightDisabled] = useState(false);
+  const scrollRowRef = useRef(null);
   const navigate = useNavigate();
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRowRef.current;
+    if (!el) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollRow(scrollWidth > clientWidth);
+    setScrollLeftDisabled(scrollLeft <= 0);
+    setScrollRightDisabled(scrollLeft + clientWidth >= scrollWidth - 1);
+  }, []);
+
+  const scrollRowBy = (direction) => {
+    const el = scrollRowRef.current;
+    if (!el) return;
+
+    const card = el.querySelector(".trending-card");
+    if (!card) return;
+
+    const style = getComputedStyle(el);
+    const gap = parseFloat(style.columnGap || style.gap) || 0;
+    const distance = (card.clientWidth + gap) * direction;
+    el.scrollBy({ left: distance, behavior: "smooth" });
+  };
+
+  const handleScroll = () => {
+    const el = scrollRowRef.current;
+    if (!el) return;
+
+    setScrollLeftDisabled(el.scrollLeft <= 0);
+    setScrollRightDisabled(el.scrollLeft + el.clientWidth >= el.scrollWidth - 1);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      scrollRowBy(-1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      scrollRowBy(1);
+    }
+  };
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function loadData() {
       try {
-        const data = await fetchTrendingAnime(controller.signal);
-        setAnimeList(data);
+        const data = await fetchTrendingAnime();
+        setAnimeList((data || []).map(normalizeTrendingAnime));
       } catch (fetchError) {
         if (fetchError.name !== "AbortError") {
           if (import.meta.env.DEV) {
@@ -42,12 +95,11 @@ const Trending = () => {
   const handleRetry = () => {
     setLoading(true);
     setError(null);
-    const controller = new AbortController();
 
     (async () => {
       try {
-        const data = await fetchTrendingAnime(controller.signal);
-        setAnimeList(data);
+        const data = await fetchTrendingAnime();
+        setAnimeList((data || []).map(normalizeTrendingAnime));
       } catch (fetchError) {
         if (fetchError.name !== "AbortError") {
           if (import.meta.env.DEV) {
@@ -67,6 +119,14 @@ const Trending = () => {
       }
     })();
   };
+
+  useEffect(() => {
+    const handleResize = () => updateScrollState();
+
+    updateScrollState();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [updateScrollState, animeList.length, loading]);
 
   const trendingCards = loading
     ? [1, 2, 3].map((rank) => (
@@ -90,7 +150,7 @@ const Trending = () => {
           className={`trending-card ${
             anime.rank === 1 ? "trending-card-featured" : ""
           }`}
-          key={anime.mal_id}
+          key={anime.id}
         >
           <img src={anime.image} alt={`${anime.title} anime poster`} />
           <span className="trending-rank">#{anime.rank}</span>
@@ -121,8 +181,41 @@ const Trending = () => {
             </div>
           ) : (
             <>
-              <div className="trending-card-row" aria-label="Trending anime">
-                {trendingCards}
+              <div className="trending-scroll-wrapper">
+                <div
+                  ref={scrollRowRef}
+                  className="trending-card-row"
+                  aria-label="Trending anime"
+                  tabIndex={0}
+                  onScroll={handleScroll}
+                  onKeyDown={handleKeyDown}
+                >
+                  {trendingCards}
+                </div>
+
+                {canScrollRow && (
+                  <button
+                    type="button"
+                    className="trending-scroll-button trending-scroll-button-left"
+                    aria-label="Scroll trending left"
+                    disabled={scrollLeftDisabled}
+                    onClick={() => scrollRowBy(-1)}
+                  >
+                    ‹
+                  </button>
+                )}
+
+                {canScrollRow && (
+                  <button
+                    type="button"
+                    className="trending-scroll-button trending-scroll-button-right"
+                    aria-label="Scroll trending right"
+                    disabled={scrollRightDisabled}
+                    onClick={() => scrollRowBy(1)}
+                  >
+                    ›
+                  </button>
+                )}
               </div>
 
               {!loading && (

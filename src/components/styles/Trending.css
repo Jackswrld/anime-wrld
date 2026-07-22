@@ -42,22 +42,92 @@
 
 .trending-showcase {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(1.5rem, 4vw, var(--space-12));
+  gap: clamp(1.25rem, 3vw, var(--space-8));
+}
+
+.trending-scroll-wrapper {
+  position: relative;
+  width: 100%;
 }
 
 .trending-card-row {
   display: flex;
+  gap: clamp(1rem, 2.5vw, var(--space-6));
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
+  padding-inline: clamp(3.2rem, 7vw, 4.5rem);
+}
+
+.trending-card-row::-webkit-scrollbar {
+  display: none;
+}
+
+.trending-card-row {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.trending-scroll-button {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1rem, 2.5vw, var(--space-6));
+  min-width: 3.2rem;
+  min-height: 3.2rem;
+  padding: 0;
+  border: 1px solid rgba(240, 248, 255, 0.3);
+  border-radius: 999px;
+  background: rgba(240, 248, 255, 0.08);
+  color: var(--color-text);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, background 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+
+.trending-scroll-button-left {
+  left: var(--space-4);
+}
+
+.trending-scroll-button-right {
+  right: var(--space-4);
+}
+
+.trending-scroll-wrapper:hover .trending-scroll-button,
+.trending-scroll-button:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) translateY(-1px);
+}
+
+.trending-scroll-button:hover,
+.trending-scroll-button:focus-visible {
+  background: rgba(240, 248, 255, 0.16);
+  border-color: rgba(240, 248, 255, 0.6);
+}
+
+.trending-scroll-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .trending-card {
   position: relative;
   width: clamp(180px, 22vw, 255px);
   aspect-ratio: 3 / 4;
+  flex-shrink: 0;
+  scroll-snap-align: start;
   overflow: hidden;
   border: 1px solid rgba(240, 248, 255, 0.11);
   border-radius: var(--radius-lg);
@@ -216,8 +286,11 @@
   }
 
   .trending-showcase {
-    flex-direction: column;
     align-items: stretch;
+  }
+
+  .trending-scroll-wrapper {
+    width: 100%;
   }
 
   .trending-card-row {
@@ -234,6 +307,12 @@
 
   .trending-view-all {
     align-self: center;
+  }
+}
+
+@media (hover: none) {
+  .trending-scroll-button {
+    display: none;
   }
 }
 

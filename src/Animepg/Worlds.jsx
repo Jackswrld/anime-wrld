@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchGenreMap, fetchAnimeByGenres } from "../api/jikan.js";
+import { fetchGenreList, fetchAnimeByGenres } from "../api/anilist";
+import { filterAnimeByAllGenres, filterVisibleGenres } from "./worldsGenreUtils";
 import "../components/styles/Worlds.css";
 import "../components/styles/Trending.css";
 
@@ -36,6 +37,7 @@ const HERO_LINES = [
   { heading: "Find Your Destiny", subheading: "Your next unforgettable anime experience is waiting to be discovered." },
   { heading: "The Story You're Looking For", subheading: "Dive into a genre that matches your imagination and passion." },
   { heading: "A World for Every Mood", subheading: "Whatever you're feeling today, there's an anime world ready for you." },
+  { heading: "Welcome To Your World", subheading: "Your journey into the world of anime starts here." },
   { heading: "Endless Adventures", subheading: "Discover stories that inspire, entertain, and stay with you forever." },
   { heading: "Welcome to Your Next Adventure", subheading: "Choose a genre, begin your journey, and let every episode tell a new story." }
 ];
@@ -63,6 +65,7 @@ export default function Worlds() {
   });
   const [genreMap, setGenreMap] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const visibleGenres = filterVisibleGenres(genreMap);
   const [shakeId, setShakeId] = useState(null);
   const [results, setResults] = useState([]);
   const [resultsLoading, setResultsLoading] = useState(false);
@@ -86,7 +89,7 @@ export default function Worlds() {
   useEffect(() => {
     (async () => {
       try {
-        const map = await fetchGenreMap();
+        const map = await fetchGenreList();
         setGenreMap(map);
         console.log(map);
       } catch (error) {
@@ -95,8 +98,8 @@ export default function Worlds() {
     })();
   }, []);
 
-  const dedupeByMalId = (animeList) =>
-    Array.from(new Map(animeList.map((anime) => [anime.mal_id, anime])).values());
+  const dedupeById = (animeList) =>
+    Array.from(new Map(animeList.map((anime) => [anime.id, anime])).values());
 
   const fetchResults = useCallback(async (genreIds, pageToLoad, append = false) => {
     if (fetchControllerRef.current) {
@@ -114,17 +117,24 @@ export default function Worlds() {
     }
 
     try {
-      const response = await fetchAnimeByGenres(genreIds, pageToLoad, controller.signal);
-      const loadedResults = response.data || [];
+      const response = await fetchAnimeByGenres(genreIds, pageToLoad);
+      const loadedResults = (Array.isArray(response) ? response : []).map((anime) => ({
+        id: anime.id,
+        title: anime.title?.romaji ?? anime.title?.english ?? "Unknown",
+        image: anime.coverImage?.extraLarge ?? anime.coverImage?.large ?? "",
+        genres: anime.genres ?? [],
+      }));
+
+      const filteredResults = filterAnimeByAllGenres(loadedResults, genreIds);
 
       if (append) {
-        setResults((current) => dedupeByMalId([...current, ...loadedResults]));
+        setResults((current) => dedupeById([...current, ...filteredResults]));
       } else {
-        setResults(dedupeByMalId(loadedResults));
+        setResults(dedupeById(filteredResults));
       }
 
       setPage(pageToLoad);
-      setHasNextPage(Boolean(response.pagination?.has_next_page));
+      setHasNextPage(false);
     } catch (error) {
       if (error?.name === "AbortError") {
         return;
@@ -229,17 +239,17 @@ export default function Worlds() {
     };
   }, []);
 
-  const toggleGenre = (id) => {
+  const toggleGenre = (genreName) => {
     setSelectedGenres((current) => {
-      if (current.includes(id)) {
-        return current.filter((genreId) => genreId !== id);
+      if (current.includes(genreName)) {
+        return current.filter((selectedGenre) => selectedGenre !== genreName);
       }
 
       if (current.length >= 3) {
         if (shakeTimerRef.current) {
           window.clearTimeout(shakeTimerRef.current);
         }
-        setShakeId(id);
+        setShakeId(genreName);
         shakeTimerRef.current = window.setTimeout(() => {
           setShakeId(null);
           shakeTimerRef.current = null;
@@ -247,7 +257,7 @@ export default function Worlds() {
         return current;
       }
 
-      return [...current, id];
+      return [...current, genreName];
     });
   };
 
@@ -271,14 +281,14 @@ export default function Worlds() {
     results.map((anime, index) => (
       <article
         className={`trending-card${index === 0 ? " trending-card-featured" : ""}`}
-        key={anime.mal_id}
+        key={anime.id}
       >
-        <img src={anime.images?.jpg?.large_image_url ?? ""} alt={`${anime.title} anime poster`} />
+        <img src={anime.image} alt={`${anime.title} anime poster`} />
         <span className="trending-rank">#{index + 1}</span>
         <div className="trending-card-overlay">
           <h3>{anime.title}</h3>
           <span className="trending-genre">
-            {anime.genres?.length ? anime.genres.slice(0, 2).map((genre) => genre.name).join(", ") : "Unknown"}
+            {anime.genres?.length ? anime.genres.slice(0, 2).join(", ") : "Unknown"}
           </span>
         </div>
       </article>
@@ -295,18 +305,18 @@ export default function Worlds() {
         <p className="worlds-subheading">{hero.subheading}</p>
       </div>
 
-      {genreMap.length === 0 ? (
+      {visibleGenres.length === 0 ? (
         <div className="worlds-status">Loading genres...</div>
       ) : (
         <div className="worlds-pill-grid">
-          {genreMap.map((g) => (
+          {visibleGenres.map((genreName) => (
             <button
-              key={g.id}
+              key={genreName}
               type="button"
-              className={`worlds-pill${selectedGenres.includes(g.id) ? " worlds-pill-active" : ""}${shakeId === g.id ? " worlds-pill-shake" : ""}`}
-              onClick={() => toggleGenre(g.id)}
+              className={`worlds-pill${selectedGenres.includes(genreName) ? " worlds-pill-active" : ""}${shakeId === genreName ? " worlds-pill-shake" : ""}`}
+              onClick={() => toggleGenre(genreName)}
             >
-              {g.name}
+              {genreName}
             </button>
           ))}
         </div>
@@ -334,4 +344,4 @@ export default function Worlds() {
       )}
     </section>
   );
-}
+ }

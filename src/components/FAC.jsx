@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./styles/FAC.css";
-import { fetchCharacterDetail, fetchCharactersPage } from "../api/jikan";
+import { fetchCharacterDetail, fetchCharactersPage } from "../api/anilist";
 
 const CHARACTER_PAGE_LIMIT = 20;
 
@@ -19,12 +19,21 @@ const findSentences = (text, keywords) => {
 };
 
 const buildCharacterItem = (item) => ({
-  mal_id: item.mal_id,
-  name: item.name,
-  image: item.images?.jpg?.image_url ?? "",
-  favorites: item.favorites ?? 0,
-  about: item.about ?? "",
+  id: item.id,
+  name: item.name?.full ?? "Unknown",
+  image: item.image?.large ?? "",
+  favorites: item.favourites ?? 0,
+  about: item.description ?? "",
 });
+
+const getPrimaryVoiceActor = (edges = []) => {
+  const tvEdge = edges.find(
+    (edge) => edge.node?.format === "TV" && edge.voiceActors?.length > 0
+  );
+  const source = tvEdge ?? edges.find((edge) => edge.voiceActors?.length > 0);
+
+  return source?.voiceActors?.[0] ?? null;
+};
 
 const FAC = () => {
   const [characters, setCharacters] = useState([]);
@@ -52,8 +61,8 @@ const FAC = () => {
           timeoutId = window.setTimeout(resolve, 300);
         });
 
-        const data = await fetchCharactersPage(page, controller.signal);
-        const nextCharacters = data.map(buildCharacterItem);
+        const data = await fetchCharactersPage(page);
+        const nextCharacters = (Array.isArray(data) ? data : []).map(buildCharacterItem);
 
         setCharacters((prev) => [...prev, ...nextCharacters]);
 
@@ -112,7 +121,7 @@ const FAC = () => {
   }, [hasMore, loading]);
 
   const loadCharacterDetail = async (character) => {
-    if (detailLoading || selectedCharacter?.mal_id === character.mal_id) {
+    if (detailLoading || selectedCharacter?.id === character.id) {
       return;
     }
 
@@ -121,10 +130,22 @@ const FAC = () => {
     setAboutExpanded(false);
 
     try {
-      const detail = await fetchCharacterDetail(character.mal_id);
+      const detail = await fetchCharacterDetail(character.id);
+      const mediaEdges = Array.isArray(detail.media?.edges) ? detail.media.edges : [];
+
       setSelectedCharacter({
         ...character,
         ...detail,
+        id: detail.id ?? character.id,
+        name: detail.name?.full ?? character.name ?? "Unknown",
+        image: detail.image?.large ?? character.image ?? "",
+        about: detail.description ?? character.about ?? "",
+        anime:
+          mediaEdges.map((edge) => ({
+            anime: { title: edge.node?.title?.romaji ?? "Unknown" },
+            role: "Appears in",
+          })) ?? [],
+        voiceActor: getPrimaryVoiceActor(mediaEdges),
       });
     } catch {
       setSelectedCharacter(null);
@@ -170,16 +191,7 @@ const FAC = () => {
         : `${aboutText.slice(0, 400).trimEnd()}...`;
 
     const animeAppearance = selectedCharacter.anime?.[0];
-    const englishVoice = selectedCharacter.voices?.find(
-      (voice) => voice.language === "English"
-    );
-    const englishVoiceName = englishVoice?.person?.name
-      ? englishVoice.person.name
-          .split(",")
-          .map((part) => part.trim())
-          .reverse()
-          .join(" ")
-      : "Unknown";
+    const voiceActor = selectedCharacter.voiceActor ?? null;
 
     const abilities = findSentences(aboutText, [
       "ability",
@@ -239,6 +251,32 @@ const FAC = () => {
             <p className="fac-kanji-name">{selectedCharacter.name_kanji}</p>
           ) : null}
 
+          <div className="fac-voice-actor" aria-label="Voice actor">
+            {voiceActor?.image?.large ? (
+              <img
+                className="fac-voice-image"
+                src={voiceActor.image.large}
+                alt={voiceActor.name?.full || "Voice actor"}
+              />
+            ) : (
+              <div className="fac-va-image-placeholder" aria-hidden="true" />
+            )}
+            {voiceActor?.name?.full ? (
+              <a
+                className="fac-va-name fac-voice-link"
+                href={`https://www.google.com/search?q=${encodeURIComponent(
+                  voiceActor.name.full
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {voiceActor.name.full}
+              </a>
+            ) : (
+              <span className="fac-va-name">Not listed</span>
+            )}
+          </div>
+
           <div className="fac-meta-block">
             <span className="fac-meta-label">First Appearance</span>
             <p>
@@ -248,23 +286,7 @@ const FAC = () => {
             </p>
           </div>
 
-          <div className="fac-meta-block">
-            <span className="fac-meta-label">Voice Actor</span>
-            <p>
-              {englishVoiceName !== "Unknown" ? (
-                <a
-                  className="fac-voice-link"
-                  href={`https://www.google.com/search?q=${encodeURIComponent(englishVoiceName)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {englishVoiceName}
-                </a>
-              ) : (
-                "Unknown"
-              )}
-            </p>
-          </div>
+          
 
           <div className="fac-list-block">
             <h4>About</h4>
@@ -326,14 +348,14 @@ const FAC = () => {
             {characters.map((character) => (
               <button
                 className={`fac-portrait-card${
-                  selectedCharacter?.mal_id === character.mal_id
+                  selectedCharacter?.id === character.id
                     ? " fac-portrait-card-active"
                     : ""
                 }`}
                 type="button"
-                key={character.mal_id}
+                key={character.id}
                 onClick={() => loadCharacterDetail(character)}
-                aria-pressed={selectedCharacter?.mal_id === character.mal_id}
+                aria-pressed={selectedCharacter?.id === character.id}
               >
                 <img
                   className="fac-portrait-image"

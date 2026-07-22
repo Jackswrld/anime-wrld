@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import "../components/styles/Anime.css";
-import { fetchWithRetry } from "../api/jikan.js";
+import { fetchWithRetry } from "../api/anilist";
 
 const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
-const ANIME_API_URL = "https://api.jikan.moe/v4/anime";
 
 function Animes() {
   const [selectedLetter, setSelectedLetter] = useState("A");
@@ -34,15 +33,29 @@ function Animes() {
     setError("");
 
     try {
-      const response = await fetchWithRetry(
-        `${ANIME_API_URL}?page=${nextPage}&limit=25&order_by=title&sort=asc&letter=${encodeURIComponent(requestedLetter)}`
-      );
-      const json = await response.json();
-      const loadedAnime = (json.data || []).map((item) => ({
-        mal_id: item.mal_id,
-        title: item.title,
-        url: item.url,
-      }));
+      const query = `
+        query ($page: Int!, $perPage: Int!) {
+          Page(page: $page, perPage: $perPage) {
+            media(type: ANIME, sort: START_DATE_DESC) {
+              id
+              title { romaji english }
+              siteUrl
+            }
+          }
+        }
+      `;
+      const response = await fetchWithRetry(query, { page: nextPage, perPage: 25 });
+      const pageMedia = response?.data?.Page?.media ?? [];
+      const loadedAnime = pageMedia
+        .filter((item) => {
+          const title = item.title?.romaji ?? item.title?.english ?? "";
+          return title.trim().toUpperCase().startsWith(requestedLetter);
+        })
+        .map((item) => ({
+          id: item.id,
+          title: item.title?.romaji ?? item.title?.english ?? "Untitled",
+          url: item.siteUrl ?? "",
+        }));
 
       if (requestedLetter !== selectedLetterRef.current) {
         return;
@@ -50,7 +63,7 @@ function Animes() {
 
       setAnimeList((currentAnime) => (append ? [...currentAnime, ...loadedAnime] : loadedAnime));
       setPage(nextPage);
-      setHasMore(Boolean(json.pagination?.has_next_page));
+      setHasMore(pageMedia.length >= 25);
     } catch {
       if (requestedLetter !== selectedLetterRef.current) {
         return;
@@ -129,7 +142,7 @@ function Animes() {
           <div className="animes-list">
             {animeList.map((anime) => (
               <a
-                key={anime.mal_id}
+                key={anime.id}
                 href={anime.url}
                 target="_blank"
                 rel="noreferrer"
