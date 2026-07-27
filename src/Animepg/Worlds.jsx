@@ -87,11 +87,10 @@ export default function Worlds() {
   }, [page]);
 
   useEffect(() => {
-    (async () => {
+    (async () => { 
       try {
         const map = await fetchGenreList();
         setGenreMap(map);
-        console.log(map);
       } catch (error) {
         console.error("[Worlds] Failed to fetch genre map:", error);
       }

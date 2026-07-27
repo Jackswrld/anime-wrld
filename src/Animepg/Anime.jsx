@@ -2,7 +2,60 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import "../components/styles/Anime.css";
 import { fetchWithRetry } from "../api/anilist";
 
-const alphabet = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+const alphabet = ["#", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))];
+const MAX_AUTO_FETCHES = 15;
+const AUTO_FETCH_DELAY_MS = 300;
+const PER_PAGE = 50;
+
+const getRomajiTitle = (item) => item?.title?.romaji ?? "";
+
+const delay = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+const isJunkRomajiTitle = (title) => {
+  if (title.trim() === "") {
+    return true;
+  }
+
+  return /^\.+$/.test(title.replace(/\s/g, ""));
+};
+
+const getFirstTitleCharacter = (title) => title.trim().charAt(0).toUpperCase();
+
+const isStandardLetter = (character) => /^[A-Z]$/.test(character);
+
+const formatAnimeItem = (item) => ({
+  id: item.id,
+  title: item.title?.romaji ?? item.title?.english ?? "Untitled",
+  url: item.siteUrl ?? "",
+});
+
+const matchesSelectedLetter = (item, requestedLetter) => {
+  const title = getRomajiTitle(item);
+
+  if (isJunkRomajiTitle(title)) {
+    return false;
+  }
+
+  if (requestedLetter === "#") {
+    const firstCharacter = getFirstTitleCharacter(title);
+    return firstCharacter !== "" && !isStandardLetter(firstCharacter);
+  }
+
+  return title.trim().toUpperCase().startsWith(requestedLetter);
+};
+
+const getMatchingAnimeFromPages = (pages, requestedLetter) =>
+  pages.flatMap((pageMedia) =>
+    pageMedia.filter((item) => matchesSelectedLetter(item, requestedLetter)).map(formatAnimeItem)
+  );
+
+const hasScannedPastLetter = (pages, requestedLetter) =>
+  pages.some((pageMedia) =>
+    pageMedia.some((item) => {
+      const firstCharacter = getFirstTitleCharacter(getRomajiTitle(item));
+      return isStandardLetter(firstCharacter) && firstCharacter > requestedLetter;
+    })
+  );
 
 function Animes() {
   const [selectedLetter, setSelectedLetter] = useState("A");
@@ -13,6 +66,10 @@ function Animes() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const selectedLetterRef = useRef(selectedLetter);
+  const animeListRef = useRef(animeList);
+  const rawPagesRef = useRef([]);
+  const reachedEndRef = useRef(false);
+  const autoFetchCountRef = useRef(0);
 
   useEffect(() => {
     selectedLetterRef.current = selectedLetter;
@@ -20,12 +77,12 @@ function Animes() {
 
   const fetchPage = useCallback(async (nextPage, { append = false } = {}) => {
     const requestedLetter = selectedLetterRef.current;
+    const requestedLetterIsStandard = isStandardLetter(requestedLetter);
 
     if (append) {
       setIsLoadingMore(true);
     } else {
       setIsLoading(true);
-      setAnimeList([]);
       setHasMore(false);
       setPage(1);
     }
@@ -34,9 +91,9 @@ function Animes() {
 
     try {
       const query = `
-        query ($page: Int!, $perPage: Int!) {
+        query ($page: Int!, $perPage: Int = 50) {
           Page(page: $page, perPage: $perPage) {
-            media(type: ANIME, sort: START_DATE_DESC) {
+            media(type: ANIME, sort: TITLE_ROMAJI) {
               id
               title { romaji english }
               siteUrl
@@ -44,26 +101,89 @@ function Animes() {
           }
         }
       `;
-      const response = await fetchWithRetry(query, { page: nextPage, perPage: 25 });
-      const pageMedia = response?.data?.Page?.media ?? [];
-      const loadedAnime = pageMedia
-        .filter((item) => {
-          const title = item.title?.romaji ?? item.title?.english ?? "";
-          return title.trim().toUpperCase().startsWith(requestedLetter);
-        })
-        .map((item) => ({
-          id: item.id,
-          title: item.title?.romaji ?? item.title?.english ?? "Untitled",
-          url: item.siteUrl ?? "",
-        }));
+      let currentPage = nextPage;
+      let shouldAppend = append;
+      let shouldAutoContinue = false;
+      let accumulatedAnime = append ? animeListRef.current : [];
 
-      if (requestedLetter !== selectedLetterRef.current) {
-        return;
+      if (!append) {
+        accumulatedAnime = getMatchingAnimeFromPages(rawPagesRef.current, requestedLetter);
+        animeListRef.current = accumulatedAnime;
+        setAnimeList(accumulatedAnime);
+        setPage(rawPagesRef.current.length || 1);
       }
 
-      setAnimeList((currentAnime) => (append ? [...currentAnime, ...loadedAnime] : loadedAnime));
-      setPage(nextPage);
-      setHasMore(pageMedia.length >= 25);
+      if (requestedLetterIsStandard && !append) {
+        // Because AniList is sorted by romaji title, seeing a later letter proves
+        // all entries for the requested letter have already been scanned.
+        const scannedPastLetter = hasScannedPastLetter(rawPagesRef.current, requestedLetter);
+        setHasMore(!scannedPastLetter && !reachedEndRef.current);
+
+        if (scannedPastLetter || reachedEndRef.current) {
+          return;
+        }
+
+        currentPage = rawPagesRef.current.length + 1;
+        shouldAppend = true;
+      } else if (!append) {
+        setHasMore(!reachedEndRef.current);
+
+        if (reachedEndRef.current) {
+          return;
+        }
+
+        currentPage = rawPagesRef.current.length + 1;
+        shouldAppend = true;
+      }
+
+      do {
+        let pageMedia = rawPagesRef.current[currentPage - 1];
+
+        if (!pageMedia) {
+          const response = await fetchWithRetry(query, { page: currentPage, perPage: PER_PAGE });
+          pageMedia = response?.data?.Page?.media ?? [];
+          rawPagesRef.current[currentPage - 1] = pageMedia;
+        }
+
+        const loadedAnime = pageMedia
+          .filter((item) => matchesSelectedLetter(item, requestedLetter))
+          .map(formatAnimeItem);
+        const pageHasMore = pageMedia.length >= PER_PAGE;
+
+        if (requestedLetter !== selectedLetterRef.current) {
+          return;
+        }
+
+        if (!pageHasMore) {
+          reachedEndRef.current = true;
+        }
+
+        if (requestedLetterIsStandard) {
+          accumulatedAnime = getMatchingAnimeFromPages(rawPagesRef.current, requestedLetter);
+        } else {
+          accumulatedAnime = shouldAppend ? [...accumulatedAnime, ...loadedAnime] : loadedAnime;
+        }
+
+        animeListRef.current = accumulatedAnime;
+        setAnimeList(accumulatedAnime);
+        setPage(currentPage);
+        const scannedPastLetter =
+          requestedLetterIsStandard && hasScannedPastLetter(rawPagesRef.current, requestedLetter);
+        setHasMore(requestedLetterIsStandard ? !scannedPastLetter && !reachedEndRef.current : pageHasMore);
+
+        shouldAutoContinue = requestedLetterIsStandard
+          ? !scannedPastLetter && !reachedEndRef.current
+          : pageHasMore && autoFetchCountRef.current < MAX_AUTO_FETCHES;
+
+        if (shouldAutoContinue) {
+          if (!requestedLetterIsStandard) {
+            autoFetchCountRef.current += 1;
+          }
+          currentPage += 1;
+          shouldAppend = true;
+          await delay(AUTO_FETCH_DELAY_MS);
+        }
+      } while (shouldAutoContinue);
     } catch {
       if (requestedLetter !== selectedLetterRef.current) {
         return;
@@ -94,16 +214,17 @@ function Animes() {
     }
 
     selectedLetterRef.current = letter;
+    autoFetchCountRef.current = 0;
     setSelectedLetter(letter);
   };
 
   const handleRetry = () => {
     if (animeList.length === 0) {
-      fetchPage(1);
+      fetchPage(1, { bypassCache: true });
       return;
     }
 
-    fetchPage(page, { append: false });
+    fetchPage(page, { append: false, bypassCache: true });
   };
 
   return (
