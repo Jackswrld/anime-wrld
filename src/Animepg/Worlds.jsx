@@ -117,7 +117,8 @@ export default function Worlds() {
 
     try {
       const response = await fetchAnimeByGenres(genreIds, pageToLoad);
-      const loadedResults = (Array.isArray(response) ? response : []).map((anime) => ({
+      const { media = [], pageInfo = {} } = response ?? {};
+      const loadedResults = media.map((anime) => ({
         id: anime.id,
         title: anime.title?.romaji ?? anime.title?.english ?? "Unknown",
         image: anime.coverImage?.extraLarge ?? anime.coverImage?.large ?? "",
@@ -133,7 +134,7 @@ export default function Worlds() {
       }
 
       setPage(pageToLoad);
-      setHasNextPage(false);
+      setHasNextPage(Boolean(pageInfo.hasNextPage));
     } catch (error) {
       if (error?.name === "AbortError") {
         return;

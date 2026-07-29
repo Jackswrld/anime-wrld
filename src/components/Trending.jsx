@@ -168,7 +168,10 @@ const Trending = () => {
       <div className="trending-inner">
         <div className="trending-heading">
           <h2>Trending Now</h2>
-          <p>What the community is watching right now</p>
+          <p className="trending-heading-sub">
+            <span className="trending-heading-bar" aria-hidden="true" />
+            check out the new episodes
+          </p>
         </div>
 
         <div className="trending-showcase">

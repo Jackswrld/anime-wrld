@@ -86,19 +86,93 @@ export const fetchTrendingAnime = async (page = 1, perPage = 20) => {
   return result?.data?.Page?.media ?? [];
 };
 
+export const fetchLatestReleases = async () => {
+  const query = `
+    query {
+      Page(page: 1, perPage: 24) {
+        media(
+          type: ANIME
+          sort: TRENDING_DESC
+          status: RELEASING
+          format_in: [TV, TV_SHORT, ONA]
+          isAdult: false
+        ) {
+          id
+          title { romaji english }
+          coverImage { extraLarge large }
+          episodes
+          nextAiringEpisode { episode airingAt }
+        }
+      }
+    }
+  `;
+
+  const result = await fetchWithRetry(query, {});
+  return result?.data?.Page?.media ?? [];
+};
+
+export const fetchHeroAnime = async () => {
+  const query = `
+    query {
+      Page(page: 1, perPage: 20) {
+        media(
+          type: ANIME
+          sort: TRENDING_DESC
+          status: RELEASING
+          format_in: [TV, TV_SHORT, ONA]
+          isAdult: false
+        ) {
+          id
+          title { romaji english }
+          bannerImage
+          coverImage { extraLarge }
+          averageScore
+          seasonYear
+          format
+          duration
+          genres
+          description(asHtml: false)
+          studios(isMain: true) { nodes { name } }
+        }
+      }
+    }
+  `;
+
+  const result = await fetchWithRetry(query, {});
+  return result?.data?.Page?.media ?? [];
+};
+
+export const selectHeroSlides = (mediaArray, limit = 5) => {
+  if (!Array.isArray(mediaArray)) {
+    return [];
+  }
+
+  return mediaArray
+    .filter((media) => typeof media?.bannerImage === "string" && media.bannerImage.length > 0)
+    .slice(0, limit);
+};
+
 export const fetchAnimeByGenres = async (genres = [], page = 1, perPage = 20) => {
   const query = `
     query ($genres: [String!], $page: Int!, $perPage: Int!) {
       Page(page: $page, perPage: $perPage) {
-        media(genre_in: $genres, type: ANIME, sort: START_DATE_DESC) {
+        media(genre_in: $genres, type: ANIME, sort: POPULARITY_DESC) {
           ${MEDIA_FIELDS}
+        }
+        pageInfo {
+          hasNextPage
+          total
+          currentPage
         }
       }
     }
   `;
 
   const result = await fetchWithRetry(query, { genres, page, perPage });
-  return result?.data?.Page?.media ?? [];
+  return {
+    media: result?.data?.Page?.media ?? [],
+    pageInfo: result?.data?.Page?.pageInfo ?? { hasNextPage: false },
+  };
 };
 
 export const fetchGenreList = async () => {

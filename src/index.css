@@ -1,8 +1,4 @@
 :root {
-  --primary-color: #ff0000;
-  --secondary-color: #00ff00;
-  --background-color: #0000ff;
-
   /* ===== Color ===== */
   --color-bg: #0a0e2a; /* Midnight Navy - page background */
   --color-surface: #1a237e; /* Royal Blue - cards, panels, navbar */

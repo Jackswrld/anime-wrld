@@ -1,311 +1,261 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Play, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { fetchHeroAnime, selectHeroSlides } from "../../api/anilist";
+import LatestReleases from "../LatestReleases";
 import "./Catalogue.css";
 
-const API_BASE = "https://api.jikan.moe/v4";
+const AUTO_ADVANCE_MS = 7000;
+
+const sanitizeDescription = (raw) => {
+  if (!raw) {
+    return "";
+  }
+
+  return String(raw)
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&mdash;/g, "—")
+    .replace(/&ndash;/g, "–")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+};
 
 const Catalogue = () => {
-  const [animeList, setAnimeList] = useState([]);
-  const [genres, setGenres] = useState([]);
-  const [selectedGenres, setSelectedGenres] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [heroSlides, setHeroSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const requestIdRef = useRef(0);
 
-  const debounceRef = useRef(null);
-  const abortControllerRef = useRef(null);
+  const loadHeroAnime = useCallback(() => {
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
 
-  useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/genres/anime`);
-        if (!response.ok) {
-          throw new Error("Failed to load genres");
+    fetchHeroAnime()
+      .then((media) => {
+        if (requestIdRef.current !== requestId) return;
+
+        const slides = selectHeroSlides(media, 5);
+
+        if (!slides.length) {
+          setError("No featured anime available right now. Please try again.");
+          setHeroSlides([]);
+          return;
         }
-        const json = await response.json();
-        setGenres(json.data || []);
-      } catch (err) {
-        console.error(err);
-        setError("Something went wrong. Please try again.");
-      }
-    };
 
-    fetchGenres();
+        setHeroSlides(slides);
+        setCurrentIndex(0);
+      })
+      .catch(() => {
+        if (requestIdRef.current !== requestId) return;
+        setError("Couldn't load featured anime. Please try again.");
+        setHeroSlides([]);
+      })
+      .finally(() => {
+        if (requestIdRef.current === requestId) {
+          setLoading(false);
+        }
+      });
   }, []);
 
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    loadHeroAnime();
+  };
+
   useEffect(() => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    debounceRef.current = setTimeout(() => {
-      setDebouncedQuery(searchQuery.trim());
-    }, 400);
-
+    loadHeroAnime();
     return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
+      requestIdRef.current += 1;
     };
-  }, [searchQuery]);
+  }, [loadHeroAnime]);
+
+  const goToSlide = useCallback((index) => {
+    setCurrentIndex(index);
+  }, []);
+
+  const goToPrevious = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  }, [heroSlides.length]);
+
+  const goToNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
+  }, [heroSlides.length]);
 
   useEffect(() => {
-    const fetchAnime = async () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      const controller = new AbortController();
-      abortControllerRef.current = controller;
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        const params = new URLSearchParams();
-        params.set("page", String(currentPage));
-        params.set("limit", "20");
-
-        if (debouncedQuery) {
-          params.set("q", debouncedQuery);
-        }
-
-        if (selectedGenres.length) {
-          params.set("genres", selectedGenres.join(","));
-        }
-
-        const response = await fetch(`${API_BASE}/anime?${params.toString()}`, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load anime");
-        }
-
-        const json = await response.json();
-        setAnimeList(json.data || []);
-        setTotalPages(json.pagination?.last_visible_page ?? 0);
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error(err);
-          setError("Something went wrong. Please try again.");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnime();
-  }, [debouncedQuery, selectedGenres, currentPage]);
-
-  
-
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-    setCurrentPage(1);
-  };
-
-  const toggleGenre = (genreId) => {
-    setSelectedGenres((prev) => {
-      const updated = prev.includes(genreId)
-        ? prev.filter((id) => id !== genreId)
-        : [...prev, genreId];
-      return updated;
-    });
-  };
-
-  const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages || page === currentPage) {
-      return;
-    }
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const paginationItems = useMemo(() => {
-    if (totalPages <= 1) {
-      return [];
+    if (isPaused || heroSlides.length <= 1) {
+      return undefined;
     }
 
-    const pages = [];
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i += 1) {
-        pages.push(i);
-      }
-      return pages;
+    if (prefersReducedMotion) {
+      return undefined;
     }
 
-    if (currentPage <= 3) {
-      pages.push(1, 2, 3, 4, "ellipsis", totalPages);
-      return pages;
-    }
+    const intervalId = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
+    }, AUTO_ADVANCE_MS);
 
-    if (currentPage >= totalPages - 2) {
-      pages.push(1, "ellipsis", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-      return pages;
-    }
+    return () => clearInterval(intervalId);
+  }, [currentIndex, isPaused, heroSlides.length]);
 
-    pages.push(1, "ellipsis", currentPage - 1, currentPage, currentPage + 1, "ellipsis", totalPages);
-    return pages;
-  }, [currentPage, totalPages]);
+  const current = heroSlides[currentIndex];
 
-  const renderContent = () => {
-    if (error) {
-      return <div className="catalogue-error-state">Something went wrong. Please try again.</div>;
-    }
-
+  const renderHero = () => {
     if (loading) {
       return (
-        <div className="catalogue-grid">
-          {Array.from({ length: 20 }, (_, index) => (
-            <div key={index} className="catalogue-card catalogue-skeleton-card" />
-          ))}
+        <div className="catalogue-hero-skeleton-content" aria-hidden="true">
+          <div className="catalogue-hero-skeleton-bar catalogue-hero-skeleton-bar-title" />
+          <div className="catalogue-hero-skeleton-bar catalogue-hero-skeleton-bar-meta" />
+          <div className="catalogue-hero-skeleton-bar catalogue-hero-skeleton-bar-desc" />
+          <div className="catalogue-hero-skeleton-bar catalogue-hero-skeleton-bar-button" />
         </div>
       );
     }
 
-    if (!animeList.length) {
+    if (error || !current) {
       return (
-        <div className="catalogue-empty-state">
-          <p>No anime found. Try a different search.</p>
+        <div className="catalogue-hero-error-content">
+          <p>{error ?? "No featured anime available right now. Please try again."}</p>
+          <button type="button" className="catalogue-hero-retry-btn" onClick={handleRetry}>
+            Try Again
+          </button>
         </div>
       );
     }
+
+    const displayTitle = current.title?.english ?? current.title?.romaji ?? "";
+
+    const metaParts = [];
+    if (current.seasonYear != null) {
+      metaParts.push(String(current.seasonYear));
+    }
+    if (current.duration != null) {
+      metaParts.push(`${current.duration} min per ep`);
+    }
+    if (current.genres && current.genres.length > 0) {
+      metaParts.push(current.genres[0]);
+    }
+
+    const hasRating = current.averageScore != null;
+    const hasStudio = current.studios?.nodes?.length > 0;
+    const description = sanitizeDescription(current.description);
 
     return (
-      <div className="catalogue-grid">
-        {animeList.map((anime) => (
-          <article className="catalogue-card" key={anime.mal_id}>
-            <div className="catalogue-card-image-wrapper">
-              <img
-                className="catalogue-card-image"
-                src={anime.images?.jpg?.image_url}
-                alt={anime.title}
-              />
+      <>
+        <img
+          key={current.id}
+          className="catalogue-hero-bg"
+          src={current.bannerImage}
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="catalogue-hero-overlay" aria-hidden="true" />
+
+        <div className="catalogue-hero-content">
+          {hasRating && (
+            <div className="catalogue-hero-rating">
+              <Star className="catalogue-hero-rating-icon" size={16} fill="currentColor" />
+              <span>{(current.averageScore / 10).toFixed(1)}/10</span>
             </div>
-            <div className="catalogue-card-body">
-              <h3 className="catalogue-card-title">{anime.title}</h3>
-              <div className="catalogue-card-genre-list">
-                {anime.genres?.slice(0, 2).map((genre) => (
-                  <span className="catalogue-card-genre" key={genre.mal_id}>
-                    {genre.name}
-                  </span>
-                ))}
-              </div>
-              <div className="catalogue-card-meta">
-                <span className="catalogue-card-score">★ {anime.score ?? "N/A"}</span>
-                <span className="catalogue-card-episodes">
-                  {anime.episodes != null ? `${anime.episodes} eps` : "? eps"}
-                </span>
-              </div>
-              <button
-                type="button"
-                className="catalogue-card-button"
-                onClick={() => {
-                  // TODO: navigate to WatchPage with anime mal_id
-                }}
-              >
-                Watch Now
-              </button>
+          )}
+
+          <h1 className="catalogue-hero-title">{displayTitle}</h1>
+
+          {metaParts.length > 0 && (
+            <div className="catalogue-hero-meta">
+              {metaParts.flatMap((part, index) =>
+                index === 0
+                  ? [
+                      <span key={`part-${index}`}>{part}</span>,
+                    ]
+                  : [
+                      <span key={`sep-${index}`} className="catalogue-hero-dot-sep" aria-hidden="true">
+                        •
+                      </span>,
+                      <span key={`part-${index}`}>{part}</span>,
+                    ]
+              )}
             </div>
-          </article>
-        ))}
-      </div>
+          )}
+
+          <p className="catalogue-hero-description">{description}</p>
+
+          {hasStudio && (
+            <p className="catalogue-hero-studio">
+              <span className="catalogue-hero-studio-label">Studio:</span>{" "}
+              {current.studios.nodes[0].name}
+            </p>
+          )}
+
+          <button type="button" className="catalogue-hero-cta">
+            <Play size={18} fill="currentColor" />
+            Watch Now
+          </button>
+        </div>
+
+        {heroSlides.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="catalogue-hero-arrow catalogue-hero-arrow-prev"
+              aria-label="Previous slide"
+              onClick={goToPrevious}
+            >
+              <ChevronLeft size={24} />
+            </button>
+
+            <button
+              type="button"
+              className="catalogue-hero-arrow catalogue-hero-arrow-next"
+              aria-label="Next slide"
+              onClick={goToNext}
+            >
+              <ChevronRight size={24} />
+            </button>
+
+            <div className="catalogue-hero-dots">
+              {heroSlides.map((anime, index) => (
+                <button
+                  key={anime.id}
+                  type="button"
+                  className={`catalogue-hero-dot${index === currentIndex ? " catalogue-hero-dot-active" : ""}`}
+                  aria-label={`Go to slide ${index + 1}`}
+                  aria-current={index === currentIndex ? "true" : undefined}
+                  onClick={() => goToSlide(index)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </>
     );
   };
 
   return (
-    <section className="catalogue-root">
-      <div className="catalogue-header">
-        <h1 className="catalogue-title">Browse Anime</h1>
-        <p className="catalogue-subtitle">Discover your next obsession</p>
-      </div>
+    <>
+      <section
+        className="catalogue-hero"
+        role="region"
+        aria-label="Featured anime"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {renderHero()}
+      </section>
 
-      <div className="catalogue-search-wrap">
-        <label className="catalogue-search-label">
-          <svg
-            className="catalogue-search-icon"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              d="M10.5 3a7.5 7.5 0 015.95 12.14l4.2 4.2a1 1 0 01-1.42 1.42l-4.2-4.2A7.5 7.5 0 1110.5 3zm0 2a5.5 5.5 0 100 11 5.5 5.5 0 000-11z"
-              fill="currentColor"
-            />
-          </svg>
-          <input
-            className="catalogue-search-field"
-            type="search"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Search anime..."
-          />
-        </label>
-      </div>
-
-      <div className="catalogue-genre-row">
-        {genres.map((genre) => {
-          const isSelected = selectedGenres.includes(genre.mal_id);
-          return (
-            <button
-              key={genre.mal_id}
-              type="button"
-              className={`catalogue-genre-pill${isSelected ? " selected" : ""}`}
-              onClick={() => toggleGenre(genre.mal_id)}
-            >
-              {genre.name}
-            </button>
-          );
-        })}
-      </div>
-
-      {renderContent()}
-
-      {paginationItems.length > 0 && !loading && !error && (
-        <div className="catalogue-pagination">
-          <button
-            type="button"
-            className={`catalogue-pagination-button${currentPage === 1 ? " disabled" : ""}`}
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            Previous
-          </button>
-
-          {paginationItems.map((item, index) => {
-            if (item === "ellipsis") {
-              return (
-                <span className="catalogue-pagination-ellipsis" key={`ellipsis-${index}`}>
-                  …
-                </span>
-              );
-            }
-            return (
-              <button
-                key={item}
-                type="button"
-                className={`catalogue-pagination-button${item === currentPage ? " active" : ""}`}
-                onClick={() => handlePageChange(item)}
-              >
-                {item}
-              </button>
-            );
-          })}
-
-          <button
-            type="button"
-            className={`catalogue-pagination-button${currentPage === totalPages ? " disabled" : ""}`}
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            Next
-          </button>
-        </div>
-      )}
-    </section>
+      <LatestReleases />
+    </>
   );
 };
 

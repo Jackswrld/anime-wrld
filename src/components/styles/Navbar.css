@@ -151,7 +151,7 @@
 .navbar-search:focus-within,
 .navbar-mobile-search:focus-within {
   border-color: rgba(140, 207, 255, 0.8);
-  box-shadow: 0 0 0 px rgba(140, 207, 255, 0.18), 0 4px 10px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 0 0 3px rgba(140, 207, 255, 0.18), 0 4px 10px rgba(0, 0, 0, 0.18);
 }
 
 .navbar-search-icon {

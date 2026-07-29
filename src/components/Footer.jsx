@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./styles/Footer.css";
 import image from "../assets/logo.png";
 
@@ -20,16 +21,9 @@ const Footer = () => {
         <div className="footer-links">
           <div className="footer-column">
             <h4>Explore</h4>
-            <a href="#home">Home</a>
-            <a href="#animes">Animes</a>
-            <a href="#categories">Worlds</a>
-          </div>
-
-          <div className="footer-column">
-            <h4>Support</h4>
-            <a href="#faq">FAQ</a>
-            <a href="#contact">Contact</a>
-            <a href="#privacy">Privacy</a>
+            <Link to="/">Home</Link>
+            <Link to="/anime">Animes</Link>
+            <Link to="/worlds">Worlds</Link>
           </div>
 
           <div className="footer-column">
