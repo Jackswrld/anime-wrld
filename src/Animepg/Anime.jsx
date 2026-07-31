@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import "../components/styles/Anime.css";
 import { fetchWithRetry } from "../api/anilist";
+import Footer from "../components/Footer";
 
 const alphabet = ["#", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))];
 const MAX_AUTO_FETCHES = 15;
@@ -295,6 +296,8 @@ function Animes() {
           </button>
         </div>
       )}
+
+      <Footer />
     </div>
   );
 }

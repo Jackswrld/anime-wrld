@@ -26,6 +26,21 @@
   animation: trending-fade-up 0.6s ease-out forwards;
 }
 
+.trending-heading-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+
+.trending-heading-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-accent-cyan);
+  stroke-width: 2.5;
+  flex-shrink: 0;
+}
+
 .trending-heading h2 {
   margin: 0;
   font-family: var(--font-heading);
@@ -262,6 +277,9 @@
   transform: translateY(-2px);
 }
 
+
+
+
 @keyframes trending-fade-up {
   from {
     opacity: 0;
@@ -339,6 +357,37 @@
   .trending-card {
     width: min(82vw, 290px);
     flex-basis: auto;
+  }
+}
+
+@keyframes icon-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+.trending-heading-icon {
+  animation: icon-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trending-heading-icon { animation: none; }
+}
+
+@keyframes latest-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trending-heading {
+    animation: none;
+    opacity: 1;
   }
 }
 

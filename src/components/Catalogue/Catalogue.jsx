@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Play, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { fetchHeroAnime, selectHeroSlides } from "../../api/anilist";
 import LatestReleases from "../LatestReleases";
+import Footer from "../Footer";
 import "./Catalogue.css";
 
 const AUTO_ADVANCE_MS = 7000;
@@ -255,6 +256,8 @@ const Catalogue = () => {
       </section>
 
       <LatestReleases />
+
+      <Footer />
     </>
   );
 };

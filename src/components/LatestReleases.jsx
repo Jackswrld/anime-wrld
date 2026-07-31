@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Gift } from "lucide-react";
 import AnimeCard from "./AnimeCard";
 import { fetchLatestReleases } from "../api/anilist";
 import "./styles/LatestReleases.css";
@@ -94,7 +94,10 @@ const LatestReleases = () => {
     <section className="latest-section" id="latest-releases">
       <div className="latest-inner">
         <div className="latest-heading">
+          <div className="latest-heading-row" >
           <h2>Latest Releases</h2>
+          <Gift className="latest-heading-icon" aria-hidden="true" />
+          </div>
           <p className="latest-heading-sub">
             <span className="latest-heading-bar" aria-hidden="true" />
             check out the new episodes

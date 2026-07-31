@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchTrendingAnime } from "../api/anilist";
 import "./styles/Trending.css";
+import { TrendingUp } from 'lucide-react';
 
 const normalizeTrendingAnime = (anime, index) => ({
   id: anime.id,
@@ -167,13 +168,16 @@ const Trending = () => {
     <section className="trending-section" id="trending">
       <div className="trending-inner">
         <div className="trending-heading">
+          <div className="trending-heading-row">
           <h2>Trending Now</h2>
+          <TrendingUp className="trending-heading-icon" aria-hidden="true" />
+          </div>
           <p className="trending-heading-sub">
             <span className="trending-heading-bar" aria-hidden="true" />
             check out the new episodes
           </p>
         </div>
-
+        
         <div className="trending-showcase">
           {error ? (
             <div className="trending-error">

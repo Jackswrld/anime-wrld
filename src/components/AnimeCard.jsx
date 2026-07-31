@@ -24,15 +24,15 @@ const AnimeCard = ({ anime, badgeMode }) => {
 
   return (
     <button type="button" className="anime-card">
-      <div className="anime-card-image-wrap">
-        {image ? (
-          <img className="anime-card-image" src={image} alt="" />
-        ) : (
-          <div className="anime-card-image-placeholder" aria-hidden="true" />
-        )}
-        {badgeText && <span className="anime-card-badge">{badgeText}</span>}
+      {image ? (
+        <img className="anime-card-image" src={image} alt="" />
+      ) : (
+        <div className="anime-card-image-placeholder" aria-hidden="true" />
+      )}
+      {badgeText && <span className="anime-card-badge">{badgeText}</span>}
+      <div className="anime-card-overlay">
+        <h3 className="anime-card-title">{title}</h3>
       </div>
-      <h3 className="anime-card-title">{title}</h3>
     </button>
   );
 };
