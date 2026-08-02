@@ -19,3 +19,39 @@
     height: 200px;
   }
 }
+
+.detail-tag-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.detail-tag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  color: var(--color-text);
+}
+
+.detail-tag-rank {
+  color: var(--color-text-muted);
+}
+
+.detail-tag-toggle {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-cyan);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.detail-tag-toggle:hover {
+  color: var(--color-accent-pink);
+}
