@@ -185,3 +185,27 @@
 .detail-head-description-toggle:hover {
   color: var(--color-accent-pink);
 }
+
+.detail-page {
+  width: 100%;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-6);
+}
+
+.detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+@media (max-width: 900px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
