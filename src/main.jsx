@@ -5,6 +5,7 @@ import App from './App.jsx'
 import Worlds from './Animepg/Worlds.jsx'
 import Catalogue from './components/Catalogue/Catalogue.jsx'
 import Animes from '../src/Animepg/Anime.jsx'
+import Detail from './Detailpg/Detail.jsx'
 import Navbar from './components/Navbar.jsx'
 import { Route, BrowserRouter, Routes } from 'react-router-dom'
 
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')).render(
       <Route path="/catalogue" element={<Catalogue />} />
       <Route path="/worlds" element={<Worlds />} />
       <Route path="/anime" element={<Animes />} />
+      <Route path="/anime/:id" element={<Detail />} />
     </Routes>
   </BrowserRouter>
 )
