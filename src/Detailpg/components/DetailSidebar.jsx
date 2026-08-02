@@ -60,7 +60,11 @@ const DetailSidebar = ({ media }) => {
 
   return (
     <aside className="detail-side">
-      <img className="detail-side-cover" src={coverSrc} alt="" />
+      {coverSrc ? (
+        <img className="detail-side-cover" src={coverSrc} alt="" />
+      ) : (
+        <div className="detail-side-cover detail-side-cover-placeholder" aria-hidden="true" />
+      )}
 
       {allTimeRankings.length > 0 && (
         <div className="detail-side-rankings">

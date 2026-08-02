@@ -70,6 +70,10 @@
   display: block;
 }
 
+.detail-side-cover-placeholder {
+  background: var(--color-surface);
+}
+
 .detail-side-rankings {
   display: flex;
   flex-direction: column;
@@ -195,6 +199,8 @@
   grid-template-columns: 220px 1fr;
   gap: var(--space-8);
   padding: var(--space-8) var(--space-6);
+  width: min(1120px, 100%);
+  margin: 0 auto;
 }
 
 .detail-main {

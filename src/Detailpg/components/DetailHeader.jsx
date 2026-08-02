@@ -43,6 +43,9 @@ const DetailHeader = ({ media }) => {
 
   const genres = media.genres ?? [];
   const descriptionParagraphs = normalizeDescription(media.description);
+  const isDescriptionLikelyClamped =
+    descriptionParagraphs.length > 1 ||
+    descriptionParagraphs.some((paragraph) => paragraph.length > 200);
 
   return (
     <div className="detail-head">
@@ -64,22 +67,24 @@ const DetailHeader = ({ media }) => {
         <div className="detail-head-description">
           <div
             className={
-              isDescriptionExpanded
-                ? "detail-head-description-text"
-                : "detail-head-description-text detail-head-description-clamped"
+              isDescriptionLikelyClamped && !isDescriptionExpanded
+                ? "detail-head-description-text detail-head-description-clamped"
+                : "detail-head-description-text"
             }
           >
             {descriptionParagraphs.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
-          <button
-            type="button"
-            className="detail-head-description-toggle"
-            onClick={() => setIsDescriptionExpanded((current) => !current)}
-          >
-            {isDescriptionExpanded ? "Read less" : "Read more"}
-          </button>
+          {isDescriptionLikelyClamped && (
+            <button
+              type="button"
+              className="detail-head-description-toggle"
+              onClick={() => setIsDescriptionExpanded((current) => !current)}
+            >
+              {isDescriptionExpanded ? "Read less" : "Read more"}
+            </button>
+          )}
         </div>
       )}
     </div>
