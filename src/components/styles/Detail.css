@@ -55,3 +55,66 @@
 .detail-tag-toggle:hover {
   color: var(--color-accent-pink);
 }
+
+.detail-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.detail-side-cover {
+  width: 100%;
+  aspect-ratio: 460 / 650;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  display: block;
+}
+
+.detail-side-rankings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.detail-side-rank-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  color: var(--color-text);
+}
+
+.detail-side-rank-icon-rated {
+  color: var(--color-accent-cyan);
+}
+
+.detail-side-rank-icon-popular {
+  color: var(--color-accent-pink);
+}
+
+.detail-side-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.detail-side-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.detail-side-stat-label {
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.detail-side-stat-value {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  color: var(--color-text);
+}
