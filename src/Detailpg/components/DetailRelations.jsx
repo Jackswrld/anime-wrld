@@ -35,7 +35,7 @@ const RelationCardContent = ({ edge, metaLine }) => {
         />
       )}
       <div className="detail-rel-info">
-        <span className="detail-rel-type">{formatTitleCase(edge.relationType)}</span>
+        <span className="detail-rel-type">{edge.relationType && formatTitleCase(edge.relationType)}</span>
         <span className="detail-rel-title">{getRelationTitle(node)}</span>
         {metaLine && <span className="detail-rel-meta">{metaLine}</span>}
       </div>

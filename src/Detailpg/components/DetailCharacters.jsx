@@ -28,7 +28,7 @@ const CharacterCard = ({ edge }) => {
         )}
         <div className="detail-char-info">
           <span className="detail-char-name">{node.name?.full}</span>
-          <span className="detail-char-role">{toTitleCase(edge.role)}</span>
+          <span className="detail-char-role">{edge.role && toTitleCase(edge.role)}</span>
         </div>
       </div>
 
