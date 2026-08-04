@@ -348,6 +348,148 @@ const detailFixture = {
       },
     ],
   },
+  recommendations: {
+    nodes: [
+      {
+        id: 1,
+        rating: 30,
+        mediaRecommendation: {
+          id: 70001,
+          title: {
+            romaji: "Kimi ni Todoke",
+            english: "From Me to You",
+            native: "君に届け",
+          },
+          coverImage: { large: "https://placehold.co/230x325", color: "#c98a5a" },
+          format: "TV",
+          isAdult: false,
+        },
+      },
+      {
+        id: 2,
+        rating: 88,
+        mediaRecommendation: {
+          id: 70002,
+          title: {
+            romaji: "Suki tte Ii na yo.",
+            english: "Say I Love You",
+            native: "好きっていいなよ。",
+          },
+          coverImage: { large: "https://placehold.co/230x325", color: "#5ac9a1" },
+          format: "TV",
+          isAdult: false,
+        },
+      },
+      {
+        id: 3,
+        rating: 12,
+        mediaRecommendation: null,
+      },
+      {
+        id: 4,
+        rating: 95,
+        mediaRecommendation: {
+          id: 70004,
+          title: {
+            romaji: "Restricted Romance",
+            english: "Restricted Romance EN",
+            native: null,
+          },
+          coverImage: { large: "https://placehold.co/230x325", color: "#333333" },
+          format: "TV",
+          isAdult: true,
+        },
+      },
+      {
+        id: 5,
+        rating: 67,
+        mediaRecommendation: {
+          id: 70005,
+          title: {
+            romaji: "Lovely Complex",
+            english: null,
+            native: "ラブ★コン",
+          },
+          coverImage: { large: "https://placehold.co/230x325", color: "#d16fa0" },
+          format: "TV",
+          isAdult: false,
+        },
+      },
+      {
+        id: 6,
+        rating: 54,
+        mediaRecommendation: {
+          id: 70006,
+          title: {
+            romaji: "Orange",
+            english: "Orange",
+            native: "オレンジ",
+          },
+          coverImage: { large: null, color: "#e08a4a" },
+          format: "TV",
+          isAdult: false,
+        },
+      },
+      {
+        id: 7,
+        rating: 73,
+        mediaRecommendation: {
+          id: 70007,
+          title: {
+            romaji: "Fruits Basket",
+            english: "Fruits Basket",
+            native: "フルーツバスケット",
+          },
+          coverImage: { large: "https://placehold.co/230x325", color: "#8a6fc9" },
+          format: "TV",
+          isAdult: false,
+        },
+      },
+      {
+        id: 8,
+        rating: 41,
+        mediaRecommendation: {
+          id: 70008,
+          title: {
+            romaji: "Horimiya",
+            english: "Horimiya",
+            native: "ホリミヤ",
+          },
+          coverImage: { large: "https://placehold.co/230x325", color: "#4a9fc9" },
+          format: "TV",
+          isAdult: false,
+        },
+      },
+      {
+        id: 9,
+        rating: 60,
+        mediaRecommendation: {
+          id: 70009,
+          title: {
+            romaji: "Toradora!",
+            english: "Toradora!",
+            native: "とらドラ!",
+          },
+          coverImage: { large: "https://placehold.co/230x325", color: "#c94a4a" },
+          format: "TV",
+          isAdult: false,
+        },
+      },
+    ],
+  },
+  externalLinks: [
+    { id: 1, url: "https://crunchyroll.com/ao-haru-ride", site: "Crunchyroll", type: "STREAMING", color: "#f47521", icon: null },
+    { id: 2, url: "https://netflix.com/title/12345", site: "Netflix", type: "STREAMING", color: null, icon: null },
+    { id: 3, url: "https://hulu.com/series/ao-haru-ride", site: "Hulu", type: "STREAMING", color: "#1ce783", icon: null },
+    { id: 4, url: "https://anilist.co/anime/20613", site: "AniList", type: "INFO", color: "#02a9ff", icon: null },
+    { id: 5, url: "https://myanimelist.net/anime/20613", site: "MyAnimeList", type: "INFO", color: "#2e51a2", icon: null },
+    { id: 6, url: "https://twitter.com/aoharuride", site: "Twitter", type: "SOCIAL", color: "#1da1f2", icon: null },
+  ],
+  trailer: {
+    id: "xY7z9Ab3Qw0",
+    site: "youtube",
+    thumbnail: "https://placehold.co/640x360",
+  },
 };
 
 export default detailFixture;
