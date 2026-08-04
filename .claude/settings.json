@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tasklist //FI \"IMAGENAME eq node.exe\")",
+      "Bash(wmic process *)"
+    ]
+  }
+}

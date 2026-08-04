@@ -214,7 +214,7 @@ const Catalogue = () => {
               onClick={goToPrevious}
             >
               <ChevronLeft size={24} />
-            </button>
+            </button> 
 
             <button
               type="button"
