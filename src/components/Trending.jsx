@@ -6,7 +6,7 @@ import { TrendingUp } from 'lucide-react';
 
 const normalizeTrendingAnime = (anime, index) => ({
   id: anime.id,
-  title: anime.title?.romaji ?? anime.title?.english ?? "Unknown",
+  title: anime.title?.english ?? anime.title?.romaji ?? "Unknown",
   image: anime.coverImage?.extraLarge ?? anime.coverImage?.large ?? "",
   genres: anime.genres ?? [],
   rank: index + 1,

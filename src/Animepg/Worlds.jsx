@@ -120,7 +120,7 @@ export default function Worlds() {
       const { media = [], pageInfo = {} } = response ?? {};
       const loadedResults = media.map((anime) => ({
         id: anime.id,
-        title: anime.title?.romaji ?? anime.title?.english ?? "Unknown",
+        title: anime.title?.english ?? anime.title?.romaji ?? "Unknown",
         image: anime.coverImage?.extraLarge ?? anime.coverImage?.large ?? "",
         genres: anime.genres ?? [],
       }));
