@@ -215,3 +215,18 @@
     gap: var(--space-6);
   }
 }
+
+.detail-sec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.detail-sec-heading {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--fs-body-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
