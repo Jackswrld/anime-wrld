@@ -7,6 +7,9 @@ import DetailHeader from "./components/DetailHeader";
 import DetailRelations from "./components/DetailRelations";
 import DetailCharacters from "./components/DetailCharacters";
 import DetailStaff from "./components/DetailStaff";
+import DetailRecommendations from "./components/DetailRecommendations";
+import DetailStreaming from "./components/DetailStreaming";
+import DetailTrailer from "./components/DetailTrailer";
 
 const Detail = () => {
   const { id } = useParams();
@@ -24,6 +27,9 @@ const Detail = () => {
           <DetailRelations relations={media.relations} />
           <DetailCharacters characters={media.characters} />
           <DetailStaff staff={media.staff} />
+          <DetailRecommendations recommendations={media.recommendations} />
+          <DetailStreaming externalLinks={media.externalLinks} />
+          <DetailTrailer trailer={media.trailer} />
         </div>
       </div>
     </div>
