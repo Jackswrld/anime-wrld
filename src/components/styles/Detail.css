@@ -409,3 +409,66 @@
     grid-template-columns: 1fr;
   }
 }
+
+.detail-staff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.detail-staff-card {
+  display: flex;
+  align-items: stretch;
+  height: 72px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.detail-staff-image {
+  width: 56px;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: block;
+}
+
+.detail-staff-image-placeholder {
+  background: var(--color-surface);
+}
+
+.detail-staff-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.detail-staff-name {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detail-staff-role {
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 900px) {
+  .detail-staff-grid {
+    grid-template-columns: 1fr;
+  }
+}
