@@ -591,3 +591,7 @@
   height: 32px;
   color: var(--color-text);
 }
+
+.detail-main {
+  min-width: 0;
+}
