@@ -26,12 +26,9 @@
 }
 
 .hero-brand {
-  background: linear-gradient(95deg, var(--color-accent-cyan), var(--color-text));
-  background-clip: text;
-  color: transparent;
-  font-family: var(--font-heading);
-  font-size: var(--fs-hero);
-  font-weight: 700;
+  width: min(360px, 42vw);
+  height: auto;
+  margin-top: var(--space-4);
 }
 
 .hero-title {

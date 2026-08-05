@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import logoImage from "../assets/logo.png";
+import logoImage from "../assets/anime-logo-crop.png";
 import "./styles/Navbar.css";
 
 const Navbar = () => {
@@ -62,7 +62,7 @@ const Navbar = () => {
     <header className="navbar-header" ref={navbarRef}>
       <nav className="navbar-container" aria-label="Main navigation">
         <Link className="navbar-brand" to="/" onClick={closeMobileMenu}>
-          <img className="navbar-logo" src={logoImage} alt="New World logo" />
+          <img className="navbar-logo" src={logoImage} alt="Anime Wrld logo" />
         </Link>
 
         <div className="navbar-links">

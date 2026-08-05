@@ -1,4 +1,5 @@
 import heroImage from "../assets/New World.jpg";
+import brandLogo from "../assets/anime-logo-crop.png";
 import "./styles/Hero.css";
 
 const Hero = () => {
@@ -7,7 +8,7 @@ const Hero = () => {
       <div className="hero-content">
         <h1 className="hero-title">
           Welcome To
-          <span className="hero-brand">New World</span>
+          <img className="hero-brand" src={brandLogo} alt="Anime Wrld" />
         </h1>
 
         <p className="hero-description">

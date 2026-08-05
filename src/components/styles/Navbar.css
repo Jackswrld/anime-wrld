@@ -28,10 +28,9 @@
 }
 
 .navbar-logo {
-  width: 48px;
-  height: 48px;
-  object-fit: cover;
-  border-radius: 50%;
+  width: auto;
+  height: 34px;
+  object-fit: contain;
 }
 
 .navbar-links {
@@ -265,8 +264,8 @@
   }
 
   .navbar-logo {
-    width: 44px;
-    height: 44px;
+    width: auto;
+    height: 32px;
   }
 
   .navbar-links,
