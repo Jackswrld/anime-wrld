@@ -216,3 +216,22 @@ test("fetchAnimeDetail rethrows a non-404 error instead of swallowing it", async
     globalThis.fetch = originalFetch;
   }
 });
+
+test("fetchWithRetry does not retry client errors like 404", async () => {
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+
+  globalThis.fetch = async () => {
+    calls += 1;
+    return { ok: false, status: 404, json: async () => ({}) };
+  };
+
+  try {
+    const started = Date.now();
+    await assert.rejects(() => fetchWithRetry("query { GenreCollection }"), (error) => error.status === 404);
+    assert.equal(calls, 1);
+    assert.ok(Date.now() - started < 400, "a 404 should fail fast, without backoff delays");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

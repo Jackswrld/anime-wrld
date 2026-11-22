@@ -68,6 +68,11 @@ export const fetchWithRetry = async (query, variables = {}, retries = 3) => {
         throw error;
       }
 
+      // Only the non-ok branch sets .status (4xx other than 429); retrying won't change the answer.
+      if (error?.status) {
+        throw error;
+      }
+
       if (attempt >= retries) {
         throw error;
       }
