@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { fetchGenreList, fetchAnimeByGenres } from "../api/anilist";
 import { filterAnimeByAllGenres, filterVisibleGenres } from "./worldsGenreUtils";
 import "../components/styles/Worlds.css";
@@ -279,7 +280,8 @@ export default function Worlds() {
 
   const renderResultCards = () =>
     results.map((anime, index) => (
-      <article
+      <Link
+        to={`/anime/${anime.id}`}
         className={`trending-card${index === 0 ? " trending-card-featured" : ""}`}
         key={anime.id}
       >
@@ -291,7 +293,7 @@ export default function Worlds() {
             {anime.genres?.length ? anime.genres.slice(0, 2).join(", ") : "Unknown"}
           </span>
         </div>
-      </article>
+      </Link>
     ));
 
   if (!hero) {

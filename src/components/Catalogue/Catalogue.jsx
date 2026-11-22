@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Play, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Info, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { fetchHeroAnime, selectHeroSlides } from "../../api/anilist";
 import LatestReleases from "../LatestReleases";
 import Footer from "../Footer";
@@ -199,10 +200,10 @@ const Catalogue = () => {
             </p>
           )}
 
-          <button type="button" className="catalogue-hero-cta">
-            <Play size={18} fill="currentColor" />
-            Watch Now
-          </button>
+          <Link to={`/anime/${current.id}`} className="catalogue-hero-cta">
+            <Info size={18} />
+            View Details
+          </Link>
         </div>
 
         {heroSlides.length > 1 && (

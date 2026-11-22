@@ -138,3 +138,10 @@
     flex-basis: auto;
   }
 }
+
+/* Cards are links to the Detail page: keep the card look, not link styling */
+a.anime-card {
+  display: block;
+  color: var(--color-text);
+  text-decoration: none;
+}

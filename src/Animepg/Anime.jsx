@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import "../components/styles/Anime.css";
 import { fetchWithRetry } from "../api/anilist";
 import Footer from "../components/Footer";
@@ -263,15 +264,9 @@ function Animes() {
         <>
           <div className="animes-list">
             {animeList.map((anime) => (
-              <a
-                key={anime.id}
-                href={anime.url}
-                target="_blank"
-                rel="noreferrer"
-                className="animes-title"
-              >
+              <Link key={anime.id} to={`/anime/${anime.id}`} className="animes-title">
                 {anime.title}
-              </a>
+              </Link>
             ))}
           </div>
 

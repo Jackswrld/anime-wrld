@@ -120,6 +120,7 @@
   font-weight: 700;
   font-size: var(--fs-body);
   cursor: pointer;
+  text-decoration: none;
   box-shadow: var(--shadow-glow-cyan);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }

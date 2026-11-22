@@ -147,7 +147,8 @@ const Trending = () => {
         </article>
       ))
     : animeList.map((anime) => (
-        <article
+        <Link
+          to={`/anime/${anime.id}`}
           className={`trending-card ${
             anime.rank === 1 ? "trending-card-featured" : ""
           }`}
@@ -161,7 +162,7 @@ const Trending = () => {
               {anime.genres.length ? anime.genres.join(", ") : "Unknown"}
             </span>
           </div>
-        </article>
+        </Link>
       ));
 
   return (

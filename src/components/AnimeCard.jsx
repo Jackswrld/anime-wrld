@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./styles/AnimeCard.css";
 
 const getBadgeText = (anime, badgeMode) => {
@@ -23,7 +24,7 @@ const AnimeCard = ({ anime, badgeMode }) => {
   const badgeText = getBadgeText(anime, badgeMode);
 
   return (
-    <button type="button" className="anime-card">
+    <Link to={`/anime/${anime.id}`} className="anime-card">
       {image ? (
         <img className="anime-card-image" src={image} alt="" />
       ) : (
@@ -33,7 +34,7 @@ const AnimeCard = ({ anime, badgeMode }) => {
       <div className="anime-card-overlay">
         <h3 className="anime-card-title">{title}</h3>
       </div>
-    </button>
+    </Link>
   );
 };
 

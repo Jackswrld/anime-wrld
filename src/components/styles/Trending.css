@@ -473,3 +473,15 @@
     background-color: #2a3590;
   }
 }
+
+/* Cards are links to the Detail page: keep the card look, not link styling */
+a.trending-card {
+  display: block;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+a.trending-card:focus-visible {
+  outline: 2px solid var(--color-accent-cyan);
+  outline-offset: 3px;
+}
