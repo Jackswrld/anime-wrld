@@ -595,3 +595,115 @@
 .detail-main {
   min-width: 0;
 }
+
+.detail-load-banner {
+  width: 100%;
+  height: 400px;
+  border-radius: 0;
+  background: var(--color-surface);
+}
+
+@media (max-width: 900px) {
+  .detail-load-banner {
+    height: 200px;
+  }
+}
+
+.detail-load-side {
+  width: 100%;
+  min-height: 420px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.detail-load-bar {
+  width: 100%;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.detail-load-bar-title {
+  height: 40px;
+  max-width: 60%;
+}
+
+.detail-load-bar:nth-child(2) {
+  max-width: 90%;
+}
+
+.detail-load-bar:nth-child(3) {
+  max-width: 75%;
+}
+
+.detail-load-bar:nth-child(4) {
+  max-width: 50%;
+}
+
+.detail-load-pulse {
+  animation: detail-load-pulse-anim 1.8s ease-in-out infinite;
+}
+
+@keyframes detail-load-pulse-anim {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail-load-pulse {
+    animation: none;
+  }
+}
+
+.detail-err-wrap,
+.detail-404-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-24) var(--space-6);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.detail-err-heading,
+.detail-404-heading {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--fs-h2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
+
+.detail-err-message,
+.detail-404-message {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+.detail-err-retry {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  color: var(--color-bg);
+  background: var(--color-accent-cyan);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-8);
+  cursor: pointer;
+}
+
+.detail-404-link {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  color: var(--color-accent-cyan);
+  text-decoration: underline;
+}

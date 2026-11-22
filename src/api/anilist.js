@@ -12,6 +12,14 @@ const MEDIA_FIELDS = `
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let genreListCache = null;
+const detailCache = new Map();
+
+const cacheDetail = (id, value) => {
+  if (detailCache.size >= 30 && !detailCache.has(id)) {
+    detailCache.delete(detailCache.keys().next().value);
+  }
+  detailCache.set(id, value);
+};
 
 export const fetchWithRetry = async (query, variables = {}, retries = 3) => {
   const payload = {
@@ -43,7 +51,9 @@ export const fetchWithRetry = async (query, variables = {}, retries = 3) => {
       }
 
       if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+        const error = new Error(`Request failed with status ${response.status}`);
+        error.status = response.status;
+        throw error;
       }
 
       const json = await response.json();
@@ -239,4 +249,105 @@ export const fetchCharacterDetail = async (id) => {
 
   const result = await fetchWithRetry(query, { id });
   return result?.data?.Character ?? null;
+};
+
+export const fetchAnimeDetail = async (id) => {
+  const numericId = Number(id);
+
+  if (!Number.isInteger(numericId) || numericId <= 0) {
+    return null;
+  }
+
+  if (detailCache.has(numericId)) {
+    return detailCache.get(numericId);
+  }
+
+  const query = `
+    query ($id: Int) {
+      Media(id: $id, type: ANIME) {
+        id
+        title { romaji english native }
+        description(asHtml: false)
+        bannerImage
+        coverImage { extraLarge large color }
+        format
+        episodes
+        duration
+        status
+        season
+        seasonYear
+        averageScore
+        popularity
+        source
+        genres
+        isAdult
+        studios {
+          edges {
+            isMain
+            node { id name }
+          }
+        }
+        rankings { id rank type format year season allTime context }
+        tags { id name rank isMediaSpoiler isGeneralSpoiler isAdult }
+        relations {
+          edges {
+            id
+            relationType
+            node {
+              id
+              type
+              format
+              status
+              title { romaji english native }
+              coverImage { large color }
+              isAdult
+            }
+          }
+        }
+        characters(sort: [ROLE, RELEVANCE], perPage: 8) {
+          edges {
+            id
+            role
+            node { id name { full native } image { large } }
+            voiceActors { id name { full } languageV2 image { large } }
+          }
+        }
+        staff(perPage: 6) {
+          edges {
+            id
+            role
+            node { id name { full } image { large } }
+          }
+        }
+        recommendations(sort: RATING_DESC, perPage: 12) {
+          nodes {
+            id
+            rating
+            mediaRecommendation {
+              id
+              title { romaji english native }
+              coverImage { large color }
+              format
+              isAdult
+            }
+          }
+        }
+        externalLinks { id url site type color icon }
+        trailer { id site thumbnail }
+      }
+    }
+  `;
+
+  try {
+    const result = await fetchWithRetry(query, { id: numericId });
+    const media = result?.data?.Media ?? null;
+    cacheDetail(numericId, media);
+    return media;
+  } catch (error) {
+    if (error?.status === 404) {
+      cacheDetail(numericId, null);
+      return null;
+    }
+    throw error;
+  }
 };
