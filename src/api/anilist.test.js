@@ -38,6 +38,29 @@ test("fetchWithRetry retries after a transient failure", async () => {
   }
 });
 
+test("fetchWithRetry attaches the HTTP status to the thrown error for non-ok responses", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = async () => ({
+    ok: false,
+    status: 404,
+    json: async () => ({})
+  });
+
+  try {
+    await assert.rejects(
+      () => fetchWithRetry("query { GenreCollection }", {}, 0),
+      (error) => {
+        assert.equal(error.status, 404);
+        assert.match(error.message, /404/);
+        return true;
+      }
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("fetchCharacterDetail requests media edges with voice actors and format", async () => {
   const originalFetch = globalThis.fetch;
   let capturedPayload = null;

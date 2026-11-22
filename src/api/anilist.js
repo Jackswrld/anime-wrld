@@ -43,7 +43,9 @@ export const fetchWithRetry = async (query, variables = {}, retries = 3) => {
       }
 
       if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+        const error = new Error(`Request failed with status ${response.status}`);
+        error.status = response.status;
+        throw error;
       }
 
       const json = await response.json();
