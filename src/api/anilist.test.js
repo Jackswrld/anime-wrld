@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { fetchAnimeDetail, fetchCharacterDetail, fetchWithRetry, searchAnime } from "./anilist.js";
+import { fetchAnimeDetail, fetchAzPage, fetchCharacterDetail, fetchWithRetry, searchAnime } from "./anilist.js";
 
 test("fetchWithRetry retries after a transient failure", async () => {
   const originalFetch = globalThis.fetch;
@@ -272,6 +272,30 @@ test("searchAnime sends a trimmed, adult-excluded anime search and returns the m
     assert.equal(capturedPayload.variables.search, "naruto");
     assert.match(capturedPayload.query, /type:\s*ANIME/);
     assert.match(capturedPayload.query, /isAdult:\s*false/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("fetchAzPage requests one filtered page of the alphabetical list", async () => {
+  const originalFetch = globalThis.fetch;
+  let capturedPayload = null;
+
+  globalThis.fetch = async (_url, options) => {
+    capturedPayload = JSON.parse(options.body);
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ data: { Page: { media: [{ id: 1, title: { romaji: "A" } }] } } })
+    };
+  };
+
+  try {
+    assert.deepEqual(await fetchAzPage(7), [{ id: 1, title: { romaji: "A" } }]);
+    assert.deepEqual(capturedPayload.variables, { page: 7, perPage: 50 });
+    assert.match(capturedPayload.query, /isAdult: false/);
+    assert.match(capturedPayload.query, /popularity_greater: 8000/);
+    assert.match(capturedPayload.query, /sort: TITLE_ROMAJI/);
   } finally {
     globalThis.fetch = originalFetch;
   }

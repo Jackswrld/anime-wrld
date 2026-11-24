@@ -381,3 +381,27 @@ export const searchAnime = async (term, perPage = 8) => {
   const result = await fetchWithRetry(query, { search, perPage });
   return result?.data?.Page?.media ?? [];
 };
+
+// Anime A–Z: AniList won't page past 5,000 entries, so the alphabetical list is
+// limited to non-adult titles with 8,000+ users (~4,800 titles), which keeps
+// every letter A–Z within reach. Raise the threshold if AniList's catalogue
+// grows past the cap again.
+export const AZ_PER_PAGE = 50;
+export const AZ_MAX_PAGE = 5000 / AZ_PER_PAGE;
+const AZ_MEDIA_ARGS = "type: ANIME, isAdult: false, popularity_greater: 8000, sort: TITLE_ROMAJI";
+
+export const fetchAzPage = async (page) => {
+  const query = `
+    query ($page: Int!, $perPage: Int!) {
+      Page(page: $page, perPage: $perPage) {
+        media(${AZ_MEDIA_ARGS}) {
+          id
+          title { romaji english }
+        }
+      }
+    }
+  `;
+
+  const result = await fetchWithRetry(query, { page, perPage: AZ_PER_PAGE });
+  return result?.data?.Page?.media ?? [];
+};

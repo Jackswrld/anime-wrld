@@ -1,63 +1,74 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import "../components/styles/Anime.css";
-import { fetchWithRetry } from "../api/anilist";
+import { AZ_MAX_PAGE, AZ_PER_PAGE, fetchAzPage } from "../api/anilist";
+import { AZ_LETTER_START_HINTS, findLetterStartPage, getTitleLetter } from "./animeAzUtils";
 import Footer from "../components/Footer";
 
 const alphabet = ["#", ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i))];
-const MAX_AUTO_FETCHES = 15;
 const AUTO_FETCH_DELAY_MS = 300;
-const PER_PAGE = 50;
+// Load a little more automatically when the first page holds only a few matches.
+const MIN_INITIAL_MATCHES = 20;
+const MAX_INITIAL_PAGES = 3;
 
-const getRomajiTitle = (item) => item?.title?.romaji ?? "";
+// Session caches shared across letter switches and revisits, so each page is
+// only ever requested once and each letter's start is only looked up once.
+const pageCache = new Map();
+const letterStartPageCache = new Map();
 
 const delay = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 
-const isJunkRomajiTitle = (title) => {
-  if (title.trim() === "") {
-    return true;
+const getPage = async (page) => {
+  if (!pageCache.has(page)) {
+    pageCache.set(page, await fetchAzPage(page));
   }
-
-  return /^\.+$/.test(title.replace(/\s/g, ""));
+  return pageCache.get(page);
 };
 
-const getFirstTitleCharacter = (title) => title.trim().charAt(0).toUpperCase();
-
-const isStandardLetter = (character) => /^[A-Z]$/.test(character);
+const getStartPage = async (letter) => {
+  if (!letterStartPageCache.has(letter)) {
+    const startPage = await findLetterStartPage(letter, getPage, {
+      hint: AZ_LETTER_START_HINTS[letter],
+      maxPage: AZ_MAX_PAGE,
+    });
+    letterStartPageCache.set(letter, startPage);
+  }
+  return letterStartPageCache.get(letter);
+};
 
 const formatAnimeItem = (item) => ({
   id: item.id,
   title: item.title?.romaji ?? item.title?.english ?? "Untitled",
-  url: item.siteUrl ?? "",
 });
 
-const matchesSelectedLetter = (item, requestedLetter) => {
-  const title = getRomajiTitle(item);
+// Matches for `letter` across the loaded pages, plus whether there could be more.
+const summarizePages = (pageNumbers, letter) => {
+  const seen = new Set();
+  const list = [];
+  let passedLetter = false;
+  let reachedEnd = false;
 
-  if (isJunkRomajiTitle(title)) {
-    return false;
-  }
+  pageNumbers.forEach((pageNumber) => {
+    const media = pageCache.get(pageNumber) ?? [];
+    if (media.length < AZ_PER_PAGE || pageNumber >= AZ_MAX_PAGE) {
+      reachedEnd = true;
+    }
+    media.forEach((item) => {
+      const titleLetter = getTitleLetter(item.title?.romaji);
+      if (titleLetter === letter && !seen.has(item.id)) {
+        seen.add(item.id);
+        list.push(formatAnimeItem(item));
+      }
+      // Symbols/digits sort first, so the first Latin title ends the "#" block;
+      // for a letter, any later letter means we've read all of it.
+      if (titleLetter && titleLetter !== "#" && (letter === "#" || titleLetter > letter)) {
+        passedLetter = true;
+      }
+    });
+  });
 
-  if (requestedLetter === "#") {
-    const firstCharacter = getFirstTitleCharacter(title);
-    return firstCharacter !== "" && !isStandardLetter(firstCharacter);
-  }
-
-  return title.trim().toUpperCase().startsWith(requestedLetter);
+  return { list, hasMore: !passedLetter && !reachedEnd };
 };
-
-const getMatchingAnimeFromPages = (pages, requestedLetter) =>
-  pages.flatMap((pageMedia) =>
-    pageMedia.filter((item) => matchesSelectedLetter(item, requestedLetter)).map(formatAnimeItem)
-  );
-
-const hasScannedPastLetter = (pages, requestedLetter) =>
-  pages.some((pageMedia) =>
-    pageMedia.some((item) => {
-      const firstCharacter = getFirstTitleCharacter(getRomajiTitle(item));
-      return isStandardLetter(firstCharacter) && firstCharacter > requestedLetter;
-    })
-  );
 
 function Animes() {
   // The letter lives in the URL (?letter=K) so Back from a Detail page returns to the same letter.
@@ -75,171 +86,105 @@ function Animes() {
     );
   };
   const [animeList, setAnimeList] = useState([]);
-  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState("");
-  const selectedLetterRef = useRef(selectedLetter);
-  const animeListRef = useRef(animeList);
-  const rawPagesRef = useRef([]);
-  const reachedEndRef = useRef(false);
-  const autoFetchCountRef = useRef(0);
+  // Pages loaded for the current letter, and a token so a slow response for a
+  // previous letter can't overwrite the current one.
+  const loadedPagesRef = useRef([]);
+  const requestTokenRef = useRef(0);
 
-  useEffect(() => {
-    selectedLetterRef.current = selectedLetter;
-  }, [selectedLetter]);
-
-  const fetchPage = useCallback(async (nextPage, { append = false } = {}) => {
-    const requestedLetter = selectedLetterRef.current;
-    const requestedLetterIsStandard = isStandardLetter(requestedLetter);
-
-    if (append) {
-      setIsLoadingMore(true);
-    } else {
-      setIsLoading(true);
-      setHasMore(false);
-      setPage(1);
-    }
-
+  const loadLetter = useCallback(async (letter) => {
+    const token = ++requestTokenRef.current;
+    setIsLoading(true);
     setError("");
 
     try {
-      const query = `
-        query ($page: Int!, $perPage: Int = 50) {
-          Page(page: $page, perPage: $perPage) {
-            media(type: ANIME, sort: TITLE_ROMAJI) {
-              id
-              title { romaji english }
-              siteUrl
-            }
-          }
-        }
-      `;
-      let currentPage = nextPage;
-      let shouldAppend = append;
-      let shouldAutoContinue = false;
-      let accumulatedAnime = append ? animeListRef.current : [];
+      const startPage = await getStartPage(letter);
+      const pages = [startPage];
+      await getPage(startPage);
+      let summary = summarizePages(pages, letter);
 
-      if (!append) {
-        accumulatedAnime = getMatchingAnimeFromPages(rawPagesRef.current, requestedLetter);
-        animeListRef.current = accumulatedAnime;
-        setAnimeList(accumulatedAnime);
-        setPage(rawPagesRef.current.length || 1);
-      }
-
-      if (requestedLetterIsStandard && !append) {
-        // Because AniList is sorted by romaji title, seeing a later letter proves
-        // all entries for the requested letter have already been scanned.
-        const scannedPastLetter = hasScannedPastLetter(rawPagesRef.current, requestedLetter);
-        setHasMore(!scannedPastLetter && !reachedEndRef.current);
-
-        if (scannedPastLetter || reachedEndRef.current) {
-          return;
-        }
-
-        currentPage = rawPagesRef.current.length + 1;
-        shouldAppend = true;
-      } else if (!append) {
-        setHasMore(!reachedEndRef.current);
-
-        if (reachedEndRef.current) {
-          return;
-        }
-
-        currentPage = rawPagesRef.current.length + 1;
-        shouldAppend = true;
-      }
-
-      do {
-        let pageMedia = rawPagesRef.current[currentPage - 1];
-
-        if (!pageMedia) {
-          const response = await fetchWithRetry(query, { page: currentPage, perPage: PER_PAGE });
-          pageMedia = response?.data?.Page?.media ?? [];
-          rawPagesRef.current[currentPage - 1] = pageMedia;
-        }
-
-        const loadedAnime = pageMedia
-          .filter((item) => matchesSelectedLetter(item, requestedLetter))
-          .map(formatAnimeItem);
-        const pageHasMore = pageMedia.length >= PER_PAGE;
-
-        if (requestedLetter !== selectedLetterRef.current) {
-          return;
-        }
-
-        if (!pageHasMore) {
-          reachedEndRef.current = true;
-        }
-
-        if (requestedLetterIsStandard) {
-          accumulatedAnime = getMatchingAnimeFromPages(rawPagesRef.current, requestedLetter);
-        } else {
-          accumulatedAnime = shouldAppend ? [...accumulatedAnime, ...loadedAnime] : loadedAnime;
-        }
-
-        animeListRef.current = accumulatedAnime;
-        setAnimeList(accumulatedAnime);
-        setPage(currentPage);
-        const scannedPastLetter =
-          requestedLetterIsStandard && hasScannedPastLetter(rawPagesRef.current, requestedLetter);
-        setHasMore(requestedLetterIsStandard ? !scannedPastLetter && !reachedEndRef.current : pageHasMore);
-
-        shouldAutoContinue = requestedLetterIsStandard
-          ? !scannedPastLetter && !reachedEndRef.current
-          : pageHasMore && autoFetchCountRef.current < MAX_AUTO_FETCHES;
-
-        if (shouldAutoContinue) {
-          if (!requestedLetterIsStandard) {
-            autoFetchCountRef.current += 1;
-          }
-          currentPage += 1;
-          shouldAppend = true;
+      while (summary.hasMore && summary.list.length < MIN_INITIAL_MATCHES && pages.length < MAX_INITIAL_PAGES) {
+        const nextPage = pages[pages.length - 1] + 1;
+        if (!pageCache.has(nextPage)) {
           await delay(AUTO_FETCH_DELAY_MS);
         }
-      } while (shouldAutoContinue);
-    } catch {
-      if (requestedLetter !== selectedLetterRef.current) {
+        await getPage(nextPage);
+        pages.push(nextPage);
+        summary = summarizePages(pages, letter);
+      }
+
+      if (token !== requestTokenRef.current) {
         return;
       }
-      setError("Couldn't load anime right now, please try again");
+      loadedPagesRef.current = pages;
+      setAnimeList(summary.list);
+      setHasMore(summary.hasMore);
+    } catch {
+      if (token === requestTokenRef.current) {
+        setAnimeList([]);
+        setHasMore(false);
+        setError("Couldn't load anime right now, please try again");
+      }
     } finally {
-      if (requestedLetter === selectedLetterRef.current) {
-        if (append) {
-          setIsLoadingMore(false);
-        } else {
-          setIsLoading(false);
-        }
+      if (token === requestTokenRef.current) {
+        setIsLoading(false);
       }
     }
   }, []);
 
+  const loadMore = async () => {
+    const token = requestTokenRef.current;
+    const letter = selectedLetter;
+    const pages = loadedPagesRef.current;
+    const nextPage = pages[pages.length - 1] + 1;
+
+    setIsLoadingMore(true);
+    setError("");
+
+    try {
+      await getPage(nextPage);
+      if (token !== requestTokenRef.current) {
+        return;
+      }
+      loadedPagesRef.current = [...pages, nextPage];
+      const summary = summarizePages(loadedPagesRef.current, letter);
+      setAnimeList(summary.list);
+      setHasMore(summary.hasMore);
+    } catch {
+      if (token === requestTokenRef.current) {
+        setError("Couldn't load more anime right now, please try again");
+      }
+    } finally {
+      if (token === requestTokenRef.current) {
+        setIsLoadingMore(false);
+      }
+    }
+  };
+
   useEffect(() => {
     const timerId = window.setTimeout(() => {
-      void fetchPage(1);
+      void loadLetter(selectedLetter);
     }, 0);
 
     return () => window.clearTimeout(timerId);
-  }, [fetchPage, selectedLetter]);
+  }, [loadLetter, selectedLetter]);
 
   const handleLetterChange = (letter) => {
     if (letter === selectedLetter) {
       return;
     }
-
-    selectedLetterRef.current = letter;
-    autoFetchCountRef.current = 0;
     setSelectedLetter(letter);
   };
 
   const handleRetry = () => {
     if (animeList.length === 0) {
-      fetchPage(1, { bypassCache: true });
+      void loadLetter(selectedLetter);
       return;
     }
-
-    fetchPage(page, { append: false, bypassCache: true });
+    void loadMore();
   };
 
   return (
@@ -287,7 +232,7 @@ function Animes() {
             <button
               type="button"
               className="animes-load-more"
-              onClick={() => fetchPage(page + 1, { append: true })}
+              onClick={() => void loadMore()}
               disabled={isLoadingMore}
             >
               {isLoadingMore ? "Loading..." : "Load More"}
