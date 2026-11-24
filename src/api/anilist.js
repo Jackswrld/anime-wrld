@@ -356,3 +356,28 @@ export const fetchAnimeDetail = async (id) => {
     throw error;
   }
 };
+
+export const searchAnime = async (term, perPage = 8) => {
+  const search = typeof term === "string" ? term.trim() : "";
+
+  if (search.length < 2) {
+    return [];
+  }
+
+  const query = `
+    query ($search: String, $perPage: Int) {
+      Page(page: 1, perPage: $perPage) {
+        media(search: $search, type: ANIME, isAdult: false, sort: SEARCH_MATCH) {
+          id
+          title { romaji english }
+          coverImage { large color }
+          format
+          seasonYear
+        }
+      }
+    }
+  `;
+
+  const result = await fetchWithRetry(query, { search, perPage });
+  return result?.data?.Page?.media ?? [];
+};

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { fetchAnimeDetail, fetchCharacterDetail, fetchWithRetry } from "./anilist.js";
+import { fetchAnimeDetail, fetchCharacterDetail, fetchWithRetry, searchAnime } from "./anilist.js";
 
 test("fetchWithRetry retries after a transient failure", async () => {
   const originalFetch = globalThis.fetch;
@@ -231,6 +231,47 @@ test("fetchWithRetry does not retry client errors like 404", async () => {
     await assert.rejects(() => fetchWithRetry("query { GenreCollection }"), (error) => error.status === 404);
     assert.equal(calls, 1);
     assert.ok(Date.now() - started < 400, "a 404 should fail fast, without backoff delays");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("searchAnime skips the network for terms shorter than 2 characters", async () => {
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    throw new Error("should not be called");
+  };
+
+  try {
+    assert.deepEqual(await searchAnime(""), []);
+    assert.deepEqual(await searchAnime("  a "), []);
+    assert.equal(calls, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("searchAnime sends a trimmed, adult-excluded anime search and returns the media list", async () => {
+  const originalFetch = globalThis.fetch;
+  let capturedPayload = null;
+
+  globalThis.fetch = async (_url, options) => {
+    capturedPayload = JSON.parse(options.body);
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ data: { Page: { media: [{ id: 20, title: { romaji: "NARUTO" } }] } } })
+    };
+  };
+
+  try {
+    const result = await searchAnime("  naruto ");
+    assert.deepEqual(result, [{ id: 20, title: { romaji: "NARUTO" } }]);
+    assert.equal(capturedPayload.variables.search, "naruto");
+    assert.match(capturedPayload.query, /type:\s*ANIME/);
+    assert.match(capturedPayload.query, /isAdult:\s*false/);
   } finally {
     globalThis.fetch = originalFetch;
   }

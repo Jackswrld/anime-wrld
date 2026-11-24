@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logoImage from "../assets/anime-logo-crop.png";
+import NavbarSearch from "./NavbarSearch";
 import "./styles/Navbar.css";
 
 const Navbar = () => {
@@ -116,10 +117,7 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-actions">
-          <label className="navbar-search">
-            <input className="navbar-search-input" type="search" placeholder="Search..." />
-            <i className="fas fa-search navbar-search-icon" aria-hidden="true" />
-          </label>
+          <NavbarSearch variant="desktop" />
 
           <Link className="navbar-latest-button" to="/catalogue">
             Latest Anime
@@ -148,10 +146,7 @@ const Navbar = () => {
           Worlds
         </Link>
 
-        <label className="navbar-mobile-search">
-          <input className="navbar-search-input" type="search" placeholder="Search..." />
-          <i className="fas fa-search navbar-search-icon" aria-hidden="true" />
-        </label>
+        <NavbarSearch variant="mobile" onNavigate={closeMobileMenu} />
 
         <Link className="navbar-mobile-latest-button" to="/catalogue" onClick={closeMobileMenu}>
           Latest Anime
