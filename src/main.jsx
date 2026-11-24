@@ -7,10 +7,12 @@ import Catalogue from './components/Catalogue/Catalogue.jsx'
 import Animes from '../src/Animepg/Anime.jsx'
 import Detail from './Detailpg/Detail.jsx'
 import Navbar from './components/Navbar.jsx'
+import ScrollRestorer from './components/ScrollRestorer.jsx'
 import { Route, BrowserRouter, Routes } from 'react-router-dom'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
+    <ScrollRestorer />
     <Navbar />
     <Routes>
       <Route path="/" element={<App />} />

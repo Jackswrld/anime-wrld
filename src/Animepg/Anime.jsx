@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import "../components/styles/Anime.css";
 import { fetchWithRetry } from "../api/anilist";
 import Footer from "../components/Footer";
@@ -60,7 +60,20 @@ const hasScannedPastLetter = (pages, requestedLetter) =>
   );
 
 function Animes() {
-  const [selectedLetter, setSelectedLetter] = useState("A");
+  // The letter lives in the URL (?letter=K) so Back from a Detail page returns to the same letter.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const letterParam = searchParams.get("letter");
+  const selectedLetter = alphabet.includes(letterParam) ? letterParam : "A";
+  const setSelectedLetter = (letter) => {
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+        next.set("letter", letter);
+        return next;
+      },
+      { replace: true }
+    );
+  };
   const [animeList, setAnimeList] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);

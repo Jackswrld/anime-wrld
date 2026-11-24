@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { fetchGenreList, fetchAnimeByGenres } from "../api/anilist";
 import { filterAnimeByAllGenres, filterVisibleGenres } from "./worldsGenreUtils";
 import "../components/styles/Worlds.css";
@@ -65,7 +65,27 @@ export default function Worlds() {
     return HERO_LINES[selectedIndex];
   });
   const [genreMap, setGenreMap] = useState([]);
-  const [selectedGenres, setSelectedGenres] = useState([]);
+  // Selected genres live in the URL (?genres=Action,Drama) so Back from a Detail page restores them.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const genresParam = searchParams.get("genres") ?? "";
+  const selectedGenres = useMemo(
+    () => filterVisibleGenres(genresParam.split(",").filter(Boolean)).slice(0, 3),
+    [genresParam]
+  );
+  const setSelectedGenres = (nextGenres) => {
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+        if (nextGenres.length) {
+          next.set("genres", nextGenres.join(","));
+        } else {
+          next.delete("genres");
+        }
+        return next;
+      },
+      { replace: true }
+    );
+  };
   const visibleGenres = filterVisibleGenres(genreMap);
   const [shakeId, setShakeId] = useState(null);
   const [results, setResults] = useState([]);
@@ -241,25 +261,24 @@ export default function Worlds() {
   }, []);
 
   const toggleGenre = (genreName) => {
-    setSelectedGenres((current) => {
-      if (current.includes(genreName)) {
-        return current.filter((selectedGenre) => selectedGenre !== genreName);
-      }
+    if (selectedGenres.includes(genreName)) {
+      setSelectedGenres(selectedGenres.filter((selectedGenre) => selectedGenre !== genreName));
+      return;
+    }
 
-      if (current.length >= 3) {
-        if (shakeTimerRef.current) {
-          window.clearTimeout(shakeTimerRef.current);
-        }
-        setShakeId(genreName);
-        shakeTimerRef.current = window.setTimeout(() => {
-          setShakeId(null);
-          shakeTimerRef.current = null;
-        }, 300);
-        return current;
+    if (selectedGenres.length >= 3) {
+      if (shakeTimerRef.current) {
+        window.clearTimeout(shakeTimerRef.current);
       }
+      setShakeId(genreName);
+      shakeTimerRef.current = window.setTimeout(() => {
+        setShakeId(null);
+        shakeTimerRef.current = null;
+      }, 300);
+      return;
+    }
 
-      return [...current, genreName];
-    });
+    setSelectedGenres([...selectedGenres, genreName]);
   };
 
   const renderLoadingCards = () =>
